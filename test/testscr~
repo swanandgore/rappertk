@@ -1,0 +1,3 @@
+python $RTKROOT/appscripts/xray.py   --pdb 1di9.pdb   --sf 1di9-sf.cif   --basemtz base.mtz   --rfreemtz rfree.mtz   --phasedmtz phased.mtz   --ccp4map ccp4.map   --a 45.176 --b 84.862 --c 127.015 --alpha 90.00 --beta 90.00 --gamma 90.00 --sg P212121
+
+python $RTKROOT/appscripts/cblauncher.py protlig   --ligfile msq.ligdesc   --pdb 1di9.pdb   --outpdb models.pdb   --ca-restraint-radius 1   --sc-centroid-restraint-radius 5   --sidechain-vdw-reduction 0.75   --population-size 100   --num-models-wanted 1   --verbose 6   --around-ligand 10   --mtz phased.mtz

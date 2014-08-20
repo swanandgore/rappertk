@@ -1,0 +1,2 @@
+when missing atoms are added, they are only added for residues to be be built
+When buidling loop, check first two ca atoms are present

@@ -1,0 +1,5 @@
+pdfcslatex chapter.tex
+bibtex -min-crossrefs 1 chapter.aux
+pdfcslatex chapter.tex
+pdfcslatex chapter.tex
+

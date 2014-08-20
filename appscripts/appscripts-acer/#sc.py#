@@ -1,0 +1,280 @@
+    def run(s) :
+        from prepareChainV3 import buildAcb
+        import checkProtChains
+        prot = protein(s.pdbfile, read_hydrogens=0, read_waters=0, read_hets=0)
+        res, resids, resnums, resns, chids, inscodes, pts = prot2res.readProtRes(prot)
+
+
+        guidedSamplingRadius = None
+        blist, numtrials, bfoll, rlist, dummies = [], [], {}, [], {}
+        bandInfrastructure = []
+        if s.guidedSampling != None : guidedSamplingRadius = s.caRad
+
+        if s.mconly :
+            res, pts = removeSC(res, pts, res.keys())
+        
+        if type(s.badresids) == type([1,2]) and len(s.badresids)==2 and type(s.badresids[0]) == type([1,2]) : # bands are given 
+            loops, looptypes = s.badresids[0], s.badresids[1]
+
+        else :
+            if s.badresids == None : s.badresids = list( resids.values() )
+            loops, looptypes = locateRegionsRandomize(resids, chids, s.badresids) # locate loops and order them randomly
+
+
+
+        mcmiss, scmiss, chainBreaks = checkProtChains.check(res, resids, resnums, resns, chids, inscodes, pts, s.cacaCutoff,s.null)
+        chainBreaks = list(chainBreaks)
+        
+
+        wholenewloops = [];        wholenewlooptypes = []
+        chainBreaks.sort() ; notbuilding = []
+        modloops , modlooptypes  = [], []
+        min_band_size = 30 ; max_band_size = 500
+        toremove = []
+
+        for k in range(len(loops)):
+            if loops[k][1] - loops[k][0] > 700 and looptypes[k] == "NtoC":
+                modloops,modlooptypes = break_chain_in_bands( loops[k][0], loops[k][1], pts, min_band_size ,max_band_size ,res,resns)
+                loops.remove(loops[k])
+                looptypes.remove(looptypes[k])
+                for ml in modloops:
+                    loops.append(ml)
+                for mlt in modlooptypes :
+                    looptypes.append(mlt)
+
+        for k in range(len(loops)):
+            if looptypes[k] == "NtoC" :
+                if len(chainBreaks) > 0:
+                    prevstop   = loops[k][0]-1
+                    for r in range(len(chainBreaks)):
+                        if chainBreaks[r] not in range(loops[k][0],loops[k][1]+1) :
+                            continue
+
+                        if  chainBreaks[r]- (prevstop+1) <= 2:
+                            for xx in range(prevstop+1 , chainBreaks[r]+1) : 
+                                notbuilding.append(resnums[xx]);
+                            prevstop = chainBreaks[r]
+                            continue                
+
+                        wholenewloops.append([prevstop+1,chainBreaks[r]])
+                        wholenewlooptypes.append("NtoC")
+                        prevstop = chainBreaks[r]
+
+                    if  loops[k][1] - (prevstop+1) <= 2: 
+                        for xx in range(prevstop+1,loops[k][1]+1):
+                            notbuilding.append(resnums[xx]);#  notbuilding.append(resnums[xx+1])                               
+                            
+                    else : 
+                        wholenewloops.append([prevstop+1,loops[k][1]])
+                        wholenewlooptypes.append("NtoC")
+
+                else :
+                    print "Adding simply",k,loops[k]
+                    if loops[k][1] - loops[k][0]  > 2:
+                        wholenewloops.append(loops[k])
+                        wholenewlooptypes.append(looptypes[k])
+                    else :
+                        print "Cant build fragment",resids[loops[k][0]] , resids[loops[k][1]]
+                        for xx in range(loops[k][0],loops[k][1]+1):
+                            notbuilding.append(resnums[xx])
+
+            elif looptypes[k] == "loop" :
+                lchbr = []
+                if len(chainBreaks) > 0:
+                    prevstop   = loops[k][0]-1
+                    for r in range(len(chainBreaks)):
+                        if chainBreaks[r]  in range(loops[k][0],loops[k][1]+1) :
+                            lchbr.append(chainBreaks[r])
+                    if len(lchbr) == 0:
+                        wholenewloops.append([loops[k][0],loops[k][1]])
+                        wholenewlooptypes.append("loop")
+                    elif len(lchbr) == 1:
+                        wholenewloops.append([loops[k][0],lchbr[0]])
+                        wholenewlooptypes.append("Cter")
+                        wholenewloops.append([lchbr[0]+1,loops[k][1]])
+                        wholenewlooptypes.append("Nter")
+                    else:
+                        for r in range(len(lchbr)):
+                            if r == 0: 
+                                wholenewloops.append([loops[k][0],lchbr[r]])
+                                wholenewlooptypes.append("Cter")
+                                prevstop = lchbr[r]
+                            elif r == len(lchbr) - 1: 
+                                wholenewloops.append([prevstop+1,loops[k][1]])
+                                wholenewlooptypes.append("Nter")
+                            else :
+                                wholenewloops.append([prevstop+1,chainBreaks[r]])
+                                wholenewlooptypes.append("NtoC")
+                else :
+                    wholenewloops.append([loops[k][0],loops[k][1]])
+                    wholenewlooptypes.append("loop")
+
+            elif looptypes[k] == "Cter" :
+                lchbr = []
+                if len(chainBreaks) > 0:
+                    prevstop   = loops[k][0]-1
+                    for r in range(len(chainBreaks)):
+                        if chainBreaks[r]  in range(loops[k][0],loops[k][1]+1) :
+                            lchbr.append(chainBreaks[r])
+
+                    if len(lchbr) == 0:
+                        wholenewloops.append(loops[k])
+                        wholenewlooptypes.append(looptypes[k])
+                    elif len(lchbr) == 1:
+                        wholenewloops.append([loops[k][0],lchbr[0]])
+                        wholenewlooptypes.append("Cter")
+                    
+                        wholenewloops.append([lchbr[0]+1,loops[k][1]])
+                        wholenewlooptypes.append("NtoC")
+
+                    else:
+                        for r in range(len(lchbr)):
+                            if r == 0: 
+                                wholenewloops.append([loops[k][0],lchbr[r]])
+                                wholenewlooptypes.append("Cter")
+                                prevstop = lchbr[r]
+                            else :
+                                wholenewloops.append([prevstop+1,lchbr[r]])
+                                wholenewlooptypes.append("NtoC")
+                                prevstop = lchbr[r]
+                                
+                        wholenewloops.append([prevstop+1,loops[k][1]])
+                        wholenewlooptypes.append("NtoC")
+                else :
+                    wholenewloops.append(loops[k])
+                    wholenewlooptypes.append(looptypes[k])
+
+
+            elif looptypes[k] == "Nter" :
+                lchbr = []
+                if len(chainBreaks) > 0:
+                    prevstop   = loops[k][0]-1
+                    for r in range(len(chainBreaks)):
+                        if chainBreaks[r]  in range(loops[k][0],loops[k][1]+1) :
+                            lchbr.append(chainBreaks[r])
+
+                    if len(lchbr) == 0:
+                        wholenewloops.append(loops[k])
+                        wholenewlooptypes.append(looptypes[k])
+                    elif len(lchbr) == 1:
+                        wholenewloops.append([lchbr[0], loops[k][1]])
+                        wholenewlooptypes.append("Nter")
+                        wholenewloops.append([loops[k][0], lchbr[0]-1])
+                        wholenewlooptypes.append("NtoC")
+
+                    else:
+                        lchbr.sort()
+                        for r in range(len(lchbr)-1,0):
+                            if r == 0:
+                                wholenewloops.append([lchbr[0], loops[k][1]])
+                                wholenewlooptypes.append("Nter")
+                                prevstop = lchbr[r]
+                            else :
+                                wholenewloops.append([lchbr[r],prevstop-1])
+                                wholenewlooptypes.append("NtoC")
+                                prevstop = lchbr[r]
+                        wholenewloops.append([loops[k][0],prevstop-1])
+                        wholenewlooptypes.append("NtoC")
+
+                else :
+                    wholenewloops.append(loops[k])
+                    wholenewlooptypes.append(looptypes[k])
+
+
+        loops = wholenewloops
+        looptypes = wholenewlooptypes
+        
+        scMissInds = [] ; caMissInds = []; s.badresids = []  ; badids = []
+        mcmiss, scmiss, chainBreaks1 = checkProtChains.check(res, resids, resnums, resns, chids, inscodes, pts, s.cacaCutoff)
+        print "Second",mcmiss,scmiss,chainBreaks1 , notbuilding
+        print "loopy",loops,looptypes
+        for startindex,endindex in loops :
+            for ri in range(startindex, endindex+1) :
+                s.badresids.append( resids[ri] )
+                badids.append(ri)
+            print "loop",resids[startindex],resids[endindex]
+        
+
+        for sc in scmiss :
+            if sc in badids  and resnums[sc] not in notbuilding: 
+                scMissInds.append(sc)
+        
+        for mc in mcmiss :
+            if mc in badids and resnums[mc] not in notbuilding: 
+                if ' CA ' not in res[mc].keys() :
+                    caMissInds.append(mc)
+                    
+                #print mc, badids
+                incompleteMCcorrection(res, resns, pts , mc) 
+                print "rla ", mc,resids[mc],res[mc]
+
+
+        if s.mconly != 1:
+            for ri in scMissInds :
+                incompleteSCcorrection2(res, resns, pts ,ri) 
+                buildAcb(res, resids, resnums, resns, chids, inscodes, pts, ri)
+
+            vvpts = VecVecFloat(pts)
+            for ri in scMissInds :
+                s.prepC.makeChiBuilder(ri,ri,ri, res,resns,resids).buildSample(vvpts, 0)
+            for pi in range(len(pts)) : pts[pi] = [ vvpts[pi][0], vvpts[pi][1], vvpts[pi][2], ]
+
+            for r in range(len(loops)):
+                if looptypes[r] == "Nter":
+                    print "Nter",loops[r][0],loops[r][1]
+                    for sc in scmiss :
+                        if sc == int(loops[r][1]) + 1  :
+                            incompleteSCcorrection2(res, resns, pts ,sc) 
+                            buildAcb(res, resids, resnums, resns, chids, inscodes, pts, sc)
+                            vvpts = VecVecFloat(pts)
+                            s.prepC.makeChiBuilder(sc,sc,sc, res,resns,resids).buildSample(vvpts, 0)
+                            for pi in range(len(pts)) :pts[pi] = [ vvpts[pi][0], vvpts[pi][1], vvpts[pi][2], ]
+                            print "Addining missing sidechain atoms:",sc
+
+                if looptypes[r] == "Cter":
+                    print "Cter",loops[r][0],loops[r][1]
+                    for sc in scmiss :
+                        if sc == int(loops[r][0]) - 1  :
+                            incompleteSCcorrection2(res, resns, pts ,sc) 
+                            buildAcb(res, resids, resnums, resns, chids, inscodes, pts, sc)
+                            vvpts = VecVecFloat(pts)                                
+
+                            s.prepC.makeChiBuilder(sc,sc,sc, res,resns,resids).buildSample(vvpts, 0)
+                            for pi in range(len(pts)) : pts[pi] = [ vvpts[pi][0], vvpts[pi][1], vvpts[pi][2], ]
+
+                if looptypes[r] == "loop":
+                    print "loop",loops[r][0],loops[r][1]
+                    for sc in scmiss :
+                        if sc == int(loops[r][0]) - 1  :
+                            incompleteSCcorrection2(res, resns, pts ,sc) 
+                            buildAcb(res, resids, resnums, resns, chids, inscodes, pts, sc)
+                            vvpts = VecVecFloat(pts)
+                            s.prepC.makeChiBuilder(sc,sc,sc, res,resns,resids).buildSample(vvpts, 0)
+                            for pi in range(len(pts)) :    pts[pi] = [ vvpts[pi][0], vvpts[pi][1], vvpts[pi][2], ]
+                        if sc == int(loops[r][1]) + 1  :
+                            incompleteSCcorrection2(res, resns, pts ,sc) 
+                            buildAcb(res, resids, resnums, resns, chids, inscodes, pts, sc)
+                            vvpts = VecVecFloat(pts)
+                            s.prepC.makeChiBuilder(sc,sc,sc, res,resns,resids).buildSample(vvpts, 0)
+                            for pi in range(len(pts)) : pts[pi] = [ vvpts[pi][0], vvpts[pi][1], vvpts[pi][2], ]                            
+
+
+                            ## print to check: What abt restraints
+        for r in range(len(loops)):
+            print "nl",loops[r] , looptypes[r]
+            print "ll",resids[loops[r][0]] , resids[loops[r][1]], looptypes[r]
+
+        for li in range(len(loops)) :
+            startindex, endindex = loops[li]
+            chid = chids[startindex]
+            assert chid == chids[endindex]
+            bl,bf,nt,rl,dum, reorderBuilders = None,None,None,None,None, 1
+
+            if s.caRad == None : 
+                for x in range(startindex,endindex+1):
+                    caMissInds.append(x)
+
+            if s.scRad == None:
+                for x in range(startindex,endindex+1):
+                    scMissInds.append(x)
+                    s.scRad = 1.

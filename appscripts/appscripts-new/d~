@@ -1,0 +1,28 @@
+  517  hg scp
+  518  scp  ./igvar-l/rtkc4/type1/out*pdb anjum@excalibur.bioc.cam.ac.uk:~/test_set/igvar-l/rtkc4/type1/.
+  519  scp  ./igvar-l/rtkc4/type1/command.txt  anjum@excalibur.bioc.cam.ac.uk:~/test_set/igvar-l/rtkc4/type1/.
+  520  scp  ./igvar-l/rtkc4/type3/command.txt  anjum@excalibur.bioc.cam.ac.uk:~/test_set/igvar-l/rtkc4/type3/.
+  521  scp  ./igvar-l/rtkc4/type3/out*  anjum@excalibur.bioc.cam.ac.uk:~/test_set/igvar-l/rtkc4/type3/.
+  522  scp  -t ./igvar-l/rapc2/type3/TESTRUNS  anjum@excalibur.bioc.cam.ac.uk:~/test_set/igvar-l/rapc2/type3/.
+  523  scp  -r ./igvar-l/rapc2/type3/TESTRUNS  anjum@excalibur.bioc.cam.ac.uk:~/test_set/igvar-l/rapc2/type3/.
+  524  scp  -r ./igvar-l/rapc2/type1/TESTRUNS  anjum@excalibur.bioc.cam.ac.uk:~/test_set/igvar-l/rapc2/type1/.
+  834  hg scp
+  845  scp  -r ./TESTRUNS  anjum@excalibur.bioc.cam.ac.uk:~/test_set/igvar-l/rapc2/type2/.
+  852  scp  -r ./TESTRUNS  anjum@excalibur.bioc.cam.ac.uk:~/test_set/igvar-l/rapc2/type2/.
+  853  scp  -r ./TESTRUNS  anjum@excalibur.bioc.cam.ac.uk:~/test_set/igvar-l/rapc2/type2/.
+  861  scp  -r ./TESTRUNS  anjum@excalibur.bioc.cam.ac.uk:~/test_set/gluts/rapc2/type1/.
+  864  scp  -r ./TESTRUNS  anjum@excalibur.bioc.cam.ac.uk:~/test_set/gluts/rapc2/type2/.
+  898  hg scp
+  899  hg scp > d
+  943  hg scp
+  944  scp  1AAC.loop   anjum@excalibur.bioc.cam.ac.uk:~/rtk152-O/test/xrayloop/.
+  945  scp  1AZC.loop anjum@excalibur.bioc.cam.ac.uk:~/rtk152-O/test/xrayloop/.
+  946  scp  1AZC.pdb  anjum@excalibur.bioc.cam.ac.uk:~/rtk152-O/test/xrayloop/.
+  950  scp  1AZC_loop1.sh anjum@excalibur.bioc.cam.ac.uk:~/rtk152-O/test/xrayloop/.
+  951  scp  1AZC_loop2.sh anjum@excalibur.bioc.cam.ac.uk:~/rtk152-O/test/xrayloop/.
+  952  scp  1AAC_loop1.sh anjum@excalibur.bioc.cam.ac.uk:~/rtk152-O/test/xrayloop/
+  953  scp  1AAC.sf anjum@excalibur.bioc.cam.ac.uk:~/rtk152-O/test/xrayloop/
+  954  scp  1AZC.sf anjum@excalibur.bioc.cam.ac.uk:~/rtk152-O/test/xrayloop/
+  969  hg scp
+  970  scp   -r anjum@excalibur.bioc.cam.ac.uk:~/rtk152-O/test .
+ 1006  hg scp > d 

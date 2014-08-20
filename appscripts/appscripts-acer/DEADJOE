@@ -1,0 +1,17 @@
+
+*** These modified files were found in JOE when it aborted on Tue May 31 17:07:16 2011
+*** JOE was aborted by UNIX signal 1
+
+*** File '(Unnamed)'
+
+*** File '(Unnamed)'
+BasicPepBuilder.cpp
+CBbuilder.cpp
+ChiBuilder.cpp
+NAbuilder.h
+NAsuiteBuilder.cpp
+InformedPeptideBuilder.cpp
+OptFragPlacer.cpp
+Restraint.cpp
+SphPosRestr.cpp
+EDrestraint.cpp

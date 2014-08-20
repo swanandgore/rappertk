@@ -1,0 +1,46 @@
+collectionRfree.py:from xray import cif2mtz, uniqueify, sfall, mtz2hkl, cns_generate, cns_anneal, sgCCP4toCNS, mapman
+collectionRfree.py:    cns_anneal(a, b, c, alpha, beta, gamma, sgCCP4toCNS[sg], reso,
+cpref.py:from xray import cif2mtz, uniqueify, sfall, mtz2hkl, cns_generate, cns_anneal, sgCCP4toCNS, fft, omitmap, mapman
+cpref.py:    cns_anneal(a, b, c, alpha, beta, gamma, sgCCP4toCNS[sg], reso,
+multiloop.py:from xray import cif2mtz, uniqueify, sfall, mtz2hkl, cns_generate, cns_anneal, sgCCP4toCNS, fft, omitmap, mapman
+multiloop.py:    cns_anneal(a, b, c, alpha, beta, gamma, sgCCP4toCNS[sg], reso,
+multisc.py:from xray import cif2mtz, uniqueify, sfall, cns_generate, cns_anneal, mtz2hkl, sgCCP4toCNS
+multProtref.py:from xray import cif2mtz, uniqueify, sfall, cns_generate, cns_anneal, mtz2hkl, sgCCP4toCNS
+ploop.py:from xray import cif2mtz, uniqueify, sfall, mtz2hkl, cns_generate, cns_anneal, sgCCP4toCNS, fft, omitmap, mapman
+ploop.py:    cns_anneal(a, b, c, alpha, beta, gamma, sgCCP4toCNS[sg], reso,
+pref1sg1.py:from xray import cif2mtz, uniqueify, sfall, mtz2hkl, cns_generate, cns_anneal, sgCCP4toCNS, fft, omitmap, mapman
+pref1sg1.py:    cns_anneal(a, b, c, alpha, beta, gamma, sgCCP4toCNS[sg], reso,
+pref.py:from xray import cif2mtz, uniqueify, sfall, mtz2hkl, cns_generate, cns_anneal, sgCCP4toCNS, fft, omitmap, mapman
+pref.py:    cns_anneal(a, b, c, alpha, beta, gamma, sgCCP4toCNS[sg], reso,
+prefX.py:from xray import cif2mtz, uniqueify, sfall, mtz2hkl, cns_generate, cns_anneal, sgCCP4toCNS, fft, omitmap, mapman
+prefX.py:    cns_anneal(a, b, c, alpha, beta, gamma, sgCCP4toCNS[sg], reso,
+protligXRefine.py:from xray import cif2mtz, uniqueify, sfall, mtz2hkl, cns_generate, cns_anneal, sgCCP4toCNS
+protligXRefine.py:        from xray import sgCCP4toCNS
+protligXRefine.py:        cns_anneal(options.a, options.b, options.c, options.alpha, options.beta, options.gamma, sgCCP4toCNS[options.sg], "cns.hkl", "generate.mtf", "generate.pdb", options.parCNS, "anneal%d.log"%cycle)
+protRefine_nick.py:from xray import cif2mtz, uniqueify, sfall, mtz2hkl, cns_generate, cns_generate_multi_chain, cns_anneal, sgCCP4toCNS, fft, refmac, phenix, cns_cis_peptide 
+protRefine_nick.py:    cns_anneal(a, b, c, alpha, beta, gamma, sgCCP4toCNS[sg], reso,
+protRefine.py:from xray import cif2mtz, uniqueify, sfall, mtz2hkl, cns_generate, cns_generate_multi_chain, cns_anneal, sgCCP4toCNS, fft, refmac
+protRefine.py:            cns_anneal(options.a, options.b, options.c, options.alpha, options.beta, options.gamma, sgCCP4toCNS[options.sg], options.resolution , "cns.hkl", "generate.mtf", "generate.pdb", None, "anneal%d.log"%cycle)
+stephen.py:from xray import cif2mtz, uniqueify, sfall, mtz2hkl, cns_generate, cns_anneal, sgCCP4toCNS, fft, omitmap, mapman
+stephen.py:    cns_anneal(a, b, c, alpha, beta, gamma, sgCCP4toCNS[sg], reso,
+stumpLOOP.py:from xray import cif2mtz, uniqueify, cns_generate, cns_anneal, mtz2hkl, sgCCP4toCNS
+stumpLOOP.py:from xray import cif2mtz, uniqueify, sfall, mtz2hkl, cns_generate, cns_anneal, sgCCP4toCNS, fft, omitmap, mapman
+stump.py:from xray import cif2mtz, uniqueify, cns_generate, cns_anneal, mtz2hkl, sgCCP4toCNS
+stump.py:from xray import cif2mtz, uniqueify, sfall, mtz2hkl, cns_generate, cns_anneal, sgCCP4toCNS, fft, omitmap, mapman
+xray.py:sgCCP4toCNS = {}
+xray.py:sgCCP4toCNS["P1"] = "P1"
+xray.py:sgCCP4toCNS["P6"] = "P6"
+xray.py:sgCCP4toCNS["P21"] = "P2(1)"
+xray.py:sgCCP4toCNS["P43"] = "P4(3)"
+xray.py:sgCCP4toCNS["P21212"] = "P2(1)2(1)2"
+xray.py:sgCCP4toCNS["P212121"] = "P2(1)2(1)2(1)"
+xray.py:sgCCP4toCNS["P1211"] = "P2(1)"
+xray.py:sgCCP4toCNS["P43212"] = "P4(3)2(1)2"
+xray.py:sgCCP4toCNS["P41212"] = "P4(1)2(1)2"
+xray.py:sgCCP4toCNS["P6522"] = "P6(5)22"
+xray.py:sgCCP4toCNS["P3221"] = "P3(2)21"
+xray.py:sgCCP4toCNS["P3121"] = "P3(1)21"
+xray.py:sgCCP4toCNS["C2221"] = "C222(1)"
+xray.py:sgCCP4toCNS["P6422"] = "P6(4)22"
+xray.py:sgCCP4toCNS["C2"] = "C2"
+xray.py:        cns_anneal(options.a, options.b, options.c, options.A, options.B, options.G, sgCCP4toCNS[options.sg], options.cnshkl, "generate.mtf", "generate.pdb", options.parCNS)

@@ -1,0 +1,10 @@
+export RTKROOT=/usr/local/xtal/rtk152-O4/
+export SWIGLIBPATH=/home/takashi/share/swig-2.0.2/
+export PYINCPATH=/home/takashi/share/Python-2.7.1
+export BGLROOT=/home/takashi/share/boost_1_46_1
+export CLIPPER=/usr/local/xtal/ccp4-6.1.13/include/clipper
+export CLIPPERGEOM=/usr/local/xtal/ccp4-6.1.13/include/clipper
+alias rappertk='python $RTKROOT/appscripts/cblauncher.py'
+alias mapman='/home/takashi/share/rave_linux/lx_mapman'
+usecns
+useccp4

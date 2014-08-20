@@ -1,0 +1,66 @@
+
+Use this to explain why your manuscript should be published in the journal, to elaborate on any issues relating to our editorial policies detailed in the instructions for authors, and to declare any potential competing interests.
+
+
+
+
+Dear Editors,
+
+Macromolecular structures are modeled by conformational sampling within knowledge-based and experimental restraints. Due to the local-minima problem, dynamics/minimization-based sampling is effective only when a conformation is within the convergence radius of a deep minimum. Discrete, restraints-based modeling identifies such conformations using the known structural preferences and sampling protocols. This approach has been successful for proteins in various contexts because it nicely supplements dynamics/minimization technique in a hybrid discrete/continuous protocol.
+
+There are many scenarios still to which this hybrid approach is yet to be applied, e.g. RNA sampling, interface diversity, NMR and so on, because the sampling requirements differ with different molecules and restraints. A software which generalizes the concepts of searching and sampling for discrete restraints-based modeling will be a useful platform for hosting and integrating experimental data with our knowledge of molecular structure.
+
+We present here RapperTK, a software library, which addresses this gap in computational structural biologist's toolkit. We describe the multilayered modular design and the flexibility it allows with its abstraction of builders, samplers, restraints, search strategy and application. We think that this manuscript will be suitable as a software article in your journal as it will be interesting to most of our readers due to its applicability to comparative modeling, electron density fitting in Xray crystallography, ligand/protein interface sampling and so on. Moreover, RapperTK sourcecode is freely available to academics to use current applications or develop their own.
+
+We do not have any competing interests to declare.
+
+We hope you find this article interesting and publishable,
+
+With best regards,
+Swanand Gore
+
+
+Discrete restraints-based modeling is becoming an attractive technique to use with other 
+
+We think that this article is suitable for publication in BMC Structural Biology because:
+
+1. The software generalizes an effective methodology (see the referenced articles) and demonstrates its extension to new and interesting scenarios.
+2. PLoS-CB has recently published an article on development of scientific software ("Scientific Software Development Is Not an Oxymoron", Baxter et. al.), which encourages us to introduce our software through this journal.
+3. The software will have wide-ranging impact, e.g. on comparative modeling, macromolecular interface analysis and interpretation of experimental (EM, NMR, crystallographic) data.
+
+Furthermore, we are impressed by the impact factor of PLoS Biology. That and immediate open-access will provide us a wide readership. Absence of artificial limits on number of figures or words is very attractive and gives us freedom to concentrate on writing a good paper.
+
+Thanks and regards,
+Swanand Gore
+
+RapperTK : a versatile engine for discrete restraint-based macromoecular sampling
+
+Swanand Gore, Anjum Karmali and Tom Blundell
+Department of Biochemistry, University of Cambridge, England
+
+Background : Estimation of macromolecular structure and dynamics is a process of sampling within the experimental and knowledge-based restraints. MD uses a continuous conformational space where forces are defined. Minimization can operate in discrete space too and gradually modifies a complete conformation to a minimum. Incremental conformational sampling with a binary energy function, highlighted by Rapper, increases the effectiveness of these methods by generating a seed ensemble which partly alleviates the problems due to ruggedness of energy landscape. Rapper has been effectively applied to proteins for loop modeling, comparative modeling and crystallographic data interpretation.
+
+Summary : We present a toolkit which generalizes discrete restraint-based sampling to address further challenges in structural biology. We describe its design and architecture which enables sampling of different types of macromolecules under a variety of experimental information. Benchmarking of the toolkit shows its efficient performance. New sampling schemes are introduced by stepwise building of beta sheets and restraint-driven sampling. RNA sampling is demonstrated by rebuilding a protein-RNA interface. Ability to sample arbitrary ligands is used in sampling protein-ligand interface in electron density. Finally, secondary structure and EM-like shape information are combined to generate multiple protein conformations. Thus, through its modular design and ease of use, this toolkit enables exploration of a wide variety of interesting avenues in structural biology. It is available to academic users free of cost.
+
+
+------------------------------------FOR BMC SB--------------------------------------------
+
+
+Dear Editors,
+
+We attach a manuscript entitled "RapperTK : a versatile engine for discrete restraint-based conformational sampling of macromolecules" which we wish to be considered for publication in BMC Structural Biology as a Software Article.
+
+Macromolecular structures are usually modeled by conformational sampling within knowledge-based and experimental restraints. Due to the local-minima problem, dynamics/minimization-based sampling is effective only when a conformation is within the convergence radius of a deep minimum. Discrete, restraints-based modeling identifies such conformations using the known structural preferences and sampling protocols. This approach has been successful for proteins in various contexts because it nicely supplements dynamics/minimization technique in a hybrid discrete/continuous protocol.
+
+There are many scenarios still to which this hybrid approach is yet to be applied, e.g. RNA sampling, interface diversity, NMR and so on, because the sampling requirements differ with different molecules and restraints. A software which generalizes the concepts of searching and sampling for discrete restraints-based modeling will be a useful platform for hosting and integrating experimental data with our knowledge of molecular structure.
+
+In this paper we present RapperTK, a software library, which addresses this gap in the computational structural biologist's toolkit. We describe the multilayered modular design and the flexibility it allows with its abstraction of builders, samplers, restraints, search strategy and application. We think that this manuscript will be suitable as a software article in your journal as it will be interesting to most of your readers due to its applicability to comparative modeling, electron density fitting in Xray crystallography, ligand/protein interface sampling and so on. Moreover, RapperTK sourcecode is freely available to academics to use current applications or to develop their own.
+
+We wanted to wanted to upload RapperTK sourcecode (a .tgz file of size 60MB) as additional file with the manuscript, but that doesnt seem possible due to size limit.
+
+We do not have any competing interests to declare.
+
+We trust that you will find this article likely to be of interest to your readership and will agree to publish it in the Software Articles category in BMC Structural Biology.
+
+With best regards,
+Swanand Gore and Tom Blundell

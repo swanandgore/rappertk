@@ -1,0 +1,53 @@
+    if ssfile !=None:
+        
+        prot = protein(modelIn, read_hydrogens=0, read_waters=0, read_hets=0)
+        res, resids, resnums, resns, chids, inscodes, pts = prot2res.readProtRes(prot)
+        rev_resnum  = {}
+        for k,v in resnums.items() : rev_resnum[int(v)] = int(k)
+        from betaBuilder import parseSSfileAK
+        helices , sheets = [], [] 
+        helices , sheets = parseSSfileAK(options.ssfile,resids,resnums)
+
+        temp = [] ;     helixind = []
+        mcMissInds = []; scMissInds = [] ; caMissInds = [];  badids = []
+        import checkProtChainsV4
+        mcmiss, scmiss, chainBreaks1 = checkProtChainsV4.check(res, resids, resnums, resns, chids, inscodes, pts ,  4.0 ,[],0)
+        for helix in helices:
+            hstartkey = int(helix[1][0]-2)  
+            hstopkey = int(helix[1][1]+2)  
+            for hs in range(hstartkey,hstopkey+1):
+                helixind.append(hs)
+        if options.mconly != 1:
+            for sc in scmiss :
+                if sc in helixind: 
+                    scMissInds.append(sc)
+                
+        for mc in mcmiss :
+            if mc in helixind : 
+                if ' CA ' not in res[mc].keys() :
+                    caMissInds.append(mc)
+
+                mcMissInds.append(mc)
+                if options.helicesOnly == 1 :
+                    misspts = incompleteMCcorrection(res, resns, pts , mc,resids)
+
+        from peptidebuild import ModelRenderer
+        modelRenderer = ModelRenderer(res, resns, chids, resnums, inscodes, [], "model0.pdb")
+        modelRenderer.render(pts)
+
+        for k,v in res.items():
+            print resids[k], res[k]
+#        import sys ; sys.exit()
+
+        temp = [] ;     helixind = []
+        for helix in helices:
+            hstartkey = int(helix[1][0])
+            hstopkey = int(helix[1][1])
+            temp.append(makeHelix(hstartkey,hstopkey,res,resids))
+            for hs in range(hstartkey,hstopkey+1):
+                helixind.append(hs)
+        for k in temp:
+            for j in k:
+                ssList.append(j)
+
+

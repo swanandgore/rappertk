@@ -1,0 +1,1530 @@
+%!PS-Adobe-2.0
+%%Creator: dot version 2.2 (Tue Sep 13 00:37:56 UTC 2005)
+%%For: (swanand) Swanand Gore
+%%Title: _anonymous_0
+%%Pages: (atend)
+%%BoundingBox: 35 35 710 1585
+%%EndComments
+save
+%%BeginProlog
+/DotDict 200 dict def
+DotDict begin
+
+/setupLatin1 {
+mark
+/EncodingVector 256 array def
+ EncodingVector 0
+
+ISOLatin1Encoding 0 255 getinterval putinterval
+
+EncodingVector
+  dup 306 /AE
+  dup 301 /Aacute
+  dup 302 /Acircumflex
+  dup 304 /Adieresis
+  dup 300 /Agrave
+  dup 305 /Aring
+  dup 303 /Atilde
+  dup 307 /Ccedilla
+  dup 311 /Eacute
+  dup 312 /Ecircumflex
+  dup 313 /Edieresis
+  dup 310 /Egrave
+  dup 315 /Iacute
+  dup 316 /Icircumflex
+  dup 317 /Idieresis
+  dup 314 /Igrave
+  dup 334 /Udieresis
+  dup 335 /Yacute
+  dup 376 /thorn
+  dup 337 /germandbls
+  dup 341 /aacute
+  dup 342 /acircumflex
+  dup 344 /adieresis
+  dup 346 /ae
+  dup 340 /agrave
+  dup 345 /aring
+  dup 347 /ccedilla
+  dup 351 /eacute
+  dup 352 /ecircumflex
+  dup 353 /edieresis
+  dup 350 /egrave
+  dup 355 /iacute
+  dup 356 /icircumflex
+  dup 357 /idieresis
+  dup 354 /igrave
+  dup 360 /dcroat
+  dup 361 /ntilde
+  dup 363 /oacute
+  dup 364 /ocircumflex
+  dup 366 /odieresis
+  dup 362 /ograve
+  dup 365 /otilde
+  dup 370 /oslash
+  dup 372 /uacute
+  dup 373 /ucircumflex
+  dup 374 /udieresis
+  dup 371 /ugrave
+  dup 375 /yacute
+  dup 377 /ydieresis  
+
+% Set up ISO Latin 1 character encoding
+/starnetISO {
+        dup dup findfont dup length dict begin
+        { 1 index /FID ne { def }{ pop pop } ifelse
+        } forall
+        /Encoding EncodingVector def
+        currentdict end definefont
+} def
+/Times-Roman starnetISO def
+/Times-Italic starnetISO def
+/Times-Bold starnetISO def
+/Times-BoldItalic starnetISO def
+/Helvetica starnetISO def
+/Helvetica-Oblique starnetISO def
+/Helvetica-Bold starnetISO def
+/Helvetica-BoldOblique starnetISO def
+/Courier starnetISO def
+/Courier-Oblique starnetISO def
+/Courier-Bold starnetISO def
+/Courier-BoldOblique starnetISO def
+cleartomark
+} bind def
+
+%%BeginResource: procset graphviz 0 0
+/coord-font-family /Times-Roman def
+/default-font-family /Times-Roman def
+/coordfont coord-font-family findfont 8 scalefont def
+
+/InvScaleFactor 1.0 def
+/set_scale {
+	dup 1 exch div /InvScaleFactor exch def
+	dup scale
+} bind def
+
+% styles
+/solid { [] 0 setdash } bind def
+/dashed { [9 InvScaleFactor mul dup ] 0 setdash } bind def
+/dotted { [1 InvScaleFactor mul 6 InvScaleFactor mul] 0 setdash } bind def
+/invis {/fill {newpath} def /stroke {newpath} def /show {pop newpath} def} bind def
+/bold { 2 setlinewidth } bind def
+/filled { } bind def
+/unfilled { } bind def
+/rounded { } bind def
+/diagonals { } bind def
+
+% hooks for setting color 
+/nodecolor { sethsbcolor } bind def
+/edgecolor { sethsbcolor } bind def
+/graphcolor { sethsbcolor } bind def
+/nopcolor {pop pop pop} bind def
+
+/beginpage {	% i j npages
+	/npages exch def
+	/j exch def
+	/i exch def
+	/str 10 string def
+	npages 1 gt {
+		gsave
+			coordfont setfont
+			0 0 moveto
+			(\() show i str cvs show (,) show j str cvs show (\)) show
+		grestore
+	} if
+} bind def
+
+/set_font {
+	findfont exch
+	scalefont setfont
+} def
+
+% draw aligned label in bounding box aligned to current point
+/alignedtext {			% width adj text
+	/text exch def
+	/adj exch def
+	/width exch def
+	gsave
+		width 0 gt {
+			text stringwidth pop adj mul 0 rmoveto
+		} if
+		[] 0 setdash
+		text show
+	grestore
+} def
+
+/boxprim {				% xcorner ycorner xsize ysize
+		4 2 roll
+		moveto
+		2 copy
+		exch 0 rlineto
+		0 exch rlineto
+		pop neg 0 rlineto
+		closepath
+} bind def
+
+/ellipse_path {
+	/ry exch def
+	/rx exch def
+	/y exch def
+	/x exch def
+	matrix currentmatrix
+	newpath
+	x y translate
+	rx ry scale
+	0 0 1 0 360 arc
+	setmatrix
+} bind def
+
+/endpage { showpage } bind def
+/showpage { } def
+
+/layercolorseq
+	[	% layer color sequence - darkest to lightest
+		[0 0 0]
+		[.2 .8 .8]
+		[.4 .8 .8]
+		[.6 .8 .8]
+		[.8 .8 .8]
+	]
+def
+
+/layerlen layercolorseq length def
+
+/setlayer {/maxlayer exch def /curlayer exch def
+	layercolorseq curlayer 1 sub layerlen mod get
+	aload pop sethsbcolor
+	/nodecolor {nopcolor} def
+	/edgecolor {nopcolor} def
+	/graphcolor {nopcolor} def
+} bind def
+
+/onlayer { curlayer ne {invis} if } def
+
+/onlayers {
+	/myupper exch def
+	/mylower exch def
+	curlayer mylower lt
+	curlayer myupper gt
+	or
+	{invis} if
+} def
+
+/curlayer 0 def
+
+%%EndResource
+%%EndProlog
+%%BeginSetup
+14 default-font-family set_font
+1 setmiterlimit
+% /arrowlength 10 def
+% /arrowwidth 5 def
+
+% make sure pdfmark is harmless for PS-interpreters other than Distiller
+/pdfmark where {pop} {userdict /pdfmark /cleartomark load put} ifelse
+% make '<<' and '>>' safe on PS Level 1 devices
+/languagelevel where {pop languagelevel}{1} ifelse
+2 lt {
+    userdict (<<) cvn ([) cvn load put
+    userdict (>>) cvn ([) cvn load put
+} if
+
+%%EndSetup
+%%Page: 1 1
+%%PageBoundingBox: 36 36 710 1585
+%%PageOrientation: Portrait
+gsave
+35 35 675 1550 boxprim clip newpath
+36 36 translate
+0 0 1 beginpage
+0 0 translate 0 rotate
+0.000 0.000 0.000 graphcolor
+14.00 /Times-Roman set_font
+
+%	CBbuilder VALA 105 
+gsave 10 dict begin
+146 1530 76 18 ellipse_path
+stroke
+gsave 10 dict begin
+82 1525 moveto
+(CBbuilder VALA 105 )
+[9.36 9.36 6.96 6.96 3.84 3.84 6.96 6.24 4.56 3.6 8.4 10.08 8.64 10.08 3.6 6.24 6.96 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	PeptideBuilder GLUA 106 
+gsave 10 dict begin
+89 1314 89 18 ellipse_path
+stroke
+gsave 10 dict begin
+13 1309 moveto
+(PeptideBuilder GLUA 106 )
+[7.44 6.24 6.96 3.84 3.84 6.96 6.24 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 10.08 8.16 9.12 10.08 3.6 6.24 6.96 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	CBbuilder VALA 105  -> PeptideBuilder GLUA 106 
+newpath 127 1512 moveto
+120 1502 112 1489 108 1476 curveto
+93 1430 86 1375 85 1342 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 89 1342 moveto
+85 1332 lineto
+82 1342 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 89 1342 moveto
+85 1332 lineto
+82 1342 lineto
+closepath
+stroke
+end grestore
+
+%	ChiBuilder VALA 105 
+gsave 10 dict begin
+204 1458 78 18 ellipse_path
+stroke
+gsave 10 dict begin
+138 1453 moveto
+(ChiBuilder VALA 105 )
+[9.36 6.96 3.84 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 8.4 10.08 8.64 10.08 3.6 6.24 6.96 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	CBbuilder VALA 105  -> ChiBuilder VALA 105 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 155 1512 moveto
+161 1503 169 1493 177 1484 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 180 1486 moveto
+184 1476 lineto
+175 1481 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 180 1486 moveto
+184 1476 lineto
+175 1481 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	PeptideBuilder GLUA 106  -> CBbuilder VALA 105 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 96 1332 moveto
+102 1363 109 1425 126 1476 curveto
+129 1485 134 1494 138 1503 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 135 1505 moveto
+143 1512 lineto
+141 1502 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 135 1505 moveto
+143 1512 lineto
+141 1502 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	ChiBuilder VALA 105  -> CBbuilder VALA 105 
+newpath 195 1476 moveto
+189 1485 181 1496 173 1505 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 170 1503 moveto
+166 1513 lineto
+175 1508 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 170 1503 moveto
+166 1513 lineto
+175 1508 lineto
+closepath
+stroke
+end grestore
+
+%	PeptideBuilder ALAA 107 
+gsave 10 dict begin
+272 1386 90 18 ellipse_path
+stroke
+gsave 10 dict begin
+195 1381 moveto
+(PeptideBuilder ALAA 107 )
+[7.44 6.24 6.96 3.84 3.84 6.96 6.24 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 10.08 8.64 10.08 10.08 3.6 6.24 6.96 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	ChiBuilder VALA 105  -> PeptideBuilder ALAA 107 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 221 1440 moveto
+229 1431 239 1421 248 1412 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 251 1414 moveto
+255 1404 lineto
+246 1409 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 251 1414 moveto
+255 1404 lineto
+246 1409 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	PeptideBuilder ALAA 107  -> PeptideBuilder GLUA 106 
+newpath 231 1370 moveto
+204 1359 168 1345 139 1334 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 141 1331 moveto
+130 1330 lineto
+138 1337 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 141 1331 moveto
+130 1330 lineto
+138 1337 lineto
+closepath
+stroke
+end grestore
+
+%	CBbuilder GLUA 106 
+gsave 10 dict begin
+272 1314 76 18 ellipse_path
+stroke
+gsave 10 dict begin
+208 1309 moveto
+(CBbuilder GLUA 106 )
+[9.36 9.36 6.96 6.96 3.84 3.84 6.96 6.24 4.56 3.6 10.08 8.16 9.12 10.08 3.6 6.24 6.96 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	PeptideBuilder ALAA 107  -> CBbuilder GLUA 106 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 266 1368 moveto
+265 1360 265 1351 265 1342 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 268 1342 moveto
+266 1332 lineto
+262 1342 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 268 1342 moveto
+266 1332 lineto
+262 1342 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	CBbuilder GLUA 106  -> PeptideBuilder ALAA 107 
+newpath 278 1332 moveto
+279 1340 279 1349 279 1358 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 276 1358 moveto
+278 1368 lineto
+282 1358 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 276 1358 moveto
+278 1368 lineto
+282 1358 lineto
+closepath
+stroke
+end grestore
+
+%	ChiBuilder GLUA 106 
+gsave 10 dict begin
+272 1242 78 18 ellipse_path
+stroke
+gsave 10 dict begin
+206 1237 moveto
+(ChiBuilder GLUA 106 )
+[9.36 6.96 3.84 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 10.08 8.16 9.12 10.08 3.6 6.24 6.96 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	CBbuilder GLUA 106  -> ChiBuilder GLUA 106 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 266 1296 moveto
+265 1288 265 1279 265 1270 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 268 1270 moveto
+266 1260 lineto
+262 1270 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 268 1270 moveto
+266 1260 lineto
+262 1270 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	ChiBuilder GLUA 106  -> CBbuilder GLUA 106 
+newpath 278 1260 moveto
+279 1268 279 1277 279 1286 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 276 1286 moveto
+278 1296 lineto
+282 1286 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 276 1286 moveto
+278 1296 lineto
+282 1286 lineto
+closepath
+stroke
+end grestore
+
+%	PeptideBuilder ILEA 108 
+gsave 10 dict begin
+325 1170 86 18 ellipse_path
+stroke
+gsave 10 dict begin
+251 1165 moveto
+(PeptideBuilder ILEA 108 )
+[7.44 6.24 6.96 3.84 3.84 6.96 6.24 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 4.56 8.64 8.64 10.08 3.6 6.24 6.96 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	ChiBuilder GLUA 106  -> PeptideBuilder ILEA 108 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 285 1224 moveto
+291 1216 299 1205 306 1196 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 309 1198 moveto
+312 1188 lineto
+303 1194 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 309 1198 moveto
+312 1188 lineto
+303 1194 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	PeptideBuilder ILEA 108  -> PeptideBuilder ALAA 107 
+newpath 340 1188 moveto
+347 1198 355 1211 359 1224 curveto
+372 1270 380 1290 357 1332 curveto
+349 1346 335 1357 322 1365 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 320 1362 moveto
+313 1370 lineto
+323 1368 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 320 1362 moveto
+313 1370 lineto
+323 1368 lineto
+closepath
+stroke
+end grestore
+
+%	CBbuilder ALAA 107 
+gsave 10 dict begin
+325 1098 77 18 ellipse_path
+stroke
+gsave 10 dict begin
+260 1093 moveto
+(CBbuilder ALAA 107 )
+[9.36 9.36 6.96 6.96 3.84 3.84 6.96 6.24 4.56 3.6 10.08 8.64 10.08 10.08 3.6 6.24 6.96 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	PeptideBuilder ILEA 108  -> CBbuilder ALAA 107 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 319 1152 moveto
+318 1144 318 1135 318 1126 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 321 1126 moveto
+319 1116 lineto
+315 1126 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 321 1126 moveto
+319 1116 lineto
+315 1126 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	CBbuilder ALAA 107  -> PeptideBuilder ILEA 108 
+newpath 331 1116 moveto
+332 1124 332 1133 332 1142 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 329 1142 moveto
+331 1152 lineto
+335 1142 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 329 1142 moveto
+331 1152 lineto
+335 1142 lineto
+closepath
+stroke
+end grestore
+
+%	PeptideBuilder VALA 109 
+gsave 10 dict begin
+377 1026 89 18 ellipse_path
+stroke
+gsave 10 dict begin
+301 1021 moveto
+(PeptideBuilder VALA 109 )
+[7.44 6.24 6.96 3.84 3.84 6.96 6.24 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 8.4 10.08 8.64 10.08 3.6 6.24 6.96 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	CBbuilder ALAA 107  -> PeptideBuilder VALA 109 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 338 1080 moveto
+344 1072 351 1061 358 1052 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 361 1054 moveto
+364 1044 lineto
+355 1050 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 361 1054 moveto
+364 1044 lineto
+355 1050 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	PeptideBuilder VALA 109  -> PeptideBuilder ILEA 108 
+newpath 393 1044 moveto
+407 1062 424 1092 411 1116 curveto
+403 1130 390 1141 376 1149 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 374 1146 moveto
+367 1154 lineto
+377 1152 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 374 1146 moveto
+367 1154 lineto
+377 1152 lineto
+closepath
+stroke
+end grestore
+
+%	CBbuilder ILEA 108 
+gsave 10 dict begin
+377 954 74 18 ellipse_path
+stroke
+gsave 10 dict begin
+316 949 moveto
+(CBbuilder ILEA 108 )
+[9.36 9.36 6.96 6.96 3.84 3.84 6.96 6.24 4.56 3.6 4.56 8.64 8.64 10.08 3.6 6.24 6.96 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	PeptideBuilder VALA 109  -> CBbuilder ILEA 108 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 371 1008 moveto
+370 1000 370 991 370 982 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 373 982 moveto
+371 972 lineto
+367 982 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 373 982 moveto
+371 972 lineto
+367 982 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	CBbuilder ILEA 108  -> PeptideBuilder VALA 109 
+newpath 383 972 moveto
+384 980 384 989 384 998 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 381 998 moveto
+383 1008 lineto
+387 998 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 381 998 moveto
+383 1008 lineto
+387 998 lineto
+closepath
+stroke
+end grestore
+
+%	ChiBuilder ILEA 108 
+gsave 10 dict begin
+377 882 75 18 ellipse_path
+stroke
+gsave 10 dict begin
+314 877 moveto
+(ChiBuilder ILEA 108 )
+[9.36 6.96 3.84 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 4.56 8.64 8.64 10.08 3.6 6.24 6.96 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	CBbuilder ILEA 108  -> ChiBuilder ILEA 108 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 371 936 moveto
+370 928 370 919 370 910 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 373 910 moveto
+371 900 lineto
+367 910 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 373 910 moveto
+371 900 lineto
+367 910 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	ChiBuilder ILEA 108  -> CBbuilder ILEA 108 
+newpath 383 900 moveto
+384 908 384 917 384 926 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 381 926 moveto
+383 936 lineto
+387 926 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 381 926 moveto
+383 936 lineto
+387 926 lineto
+closepath
+stroke
+end grestore
+
+%	PeptideBuilder GLUA 110 
+gsave 10 dict begin
+428 810 88 18 ellipse_path
+stroke
+gsave 10 dict begin
+352 805 moveto
+(PeptideBuilder GLUA 110 )
+[7.44 6.24 6.96 3.84 3.84 6.96 6.24 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 10.08 8.16 9.12 10.08 3.6 5.76 6.24 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	ChiBuilder ILEA 108  -> PeptideBuilder GLUA 110 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 390 864 moveto
+396 856 403 846 409 836 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 412 838 moveto
+415 828 lineto
+406 834 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 412 838 moveto
+415 828 lineto
+406 834 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	PeptideBuilder GLUA 110  -> PeptideBuilder VALA 109 
+newpath 443 828 moveto
+450 838 457 851 461 864 curveto
+474 910 483 929 460 972 curveto
+452 986 439 997 426 1005 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 424 1002 moveto
+417 1010 lineto
+427 1008 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 424 1002 moveto
+417 1010 lineto
+427 1008 lineto
+closepath
+stroke
+end grestore
+
+%	CBbuilder VALA 109 
+gsave 10 dict begin
+428 738 76 18 ellipse_path
+stroke
+gsave 10 dict begin
+364 733 moveto
+(CBbuilder VALA 109 )
+[9.36 9.36 6.96 6.96 3.84 3.84 6.96 6.24 4.56 3.6 8.4 10.08 8.64 10.08 3.6 6.24 6.96 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	PeptideBuilder GLUA 110  -> CBbuilder VALA 109 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 422 792 moveto
+421 784 421 775 421 766 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 424 766 moveto
+422 756 lineto
+418 766 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 424 766 moveto
+422 756 lineto
+418 766 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	CBbuilder VALA 109  -> PeptideBuilder GLUA 110 
+newpath 434 756 moveto
+435 764 435 773 435 782 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 432 782 moveto
+434 792 lineto
+438 782 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 432 782 moveto
+434 792 lineto
+438 782 lineto
+closepath
+stroke
+end grestore
+
+%	ChiBuilder VALA 109 
+gsave 10 dict begin
+428 666 78 18 ellipse_path
+stroke
+gsave 10 dict begin
+362 661 moveto
+(ChiBuilder VALA 109 )
+[9.36 6.96 3.84 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 8.4 10.08 8.64 10.08 3.6 6.24 6.96 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	CBbuilder VALA 109  -> ChiBuilder VALA 109 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 422 720 moveto
+421 712 421 703 421 694 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 424 694 moveto
+422 684 lineto
+418 694 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 424 694 moveto
+422 684 lineto
+418 694 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	ChiBuilder VALA 109  -> CBbuilder VALA 109 
+newpath 434 684 moveto
+435 692 435 701 435 710 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 432 710 moveto
+434 720 lineto
+438 710 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 432 710 moveto
+434 720 lineto
+438 710 lineto
+closepath
+stroke
+end grestore
+
+%	PeptideBuilder ASNA 111 
+gsave 10 dict begin
+481 594 88 18 ellipse_path
+stroke
+gsave 10 dict begin
+405 589 moveto
+(PeptideBuilder ASNA 111 )
+[7.44 6.24 6.96 3.84 3.84 6.96 6.24 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 10.08 7.68 9.6 10.08 3.6 5.76 5.76 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	ChiBuilder VALA 109  -> PeptideBuilder ASNA 111 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 441 648 moveto
+447 640 455 629 462 620 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 465 622 moveto
+468 612 lineto
+459 618 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 465 622 moveto
+468 612 lineto
+459 618 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	PeptideBuilder ASNA 111  -> PeptideBuilder GLUA 110 
+newpath 496 612 moveto
+503 622 511 635 515 648 curveto
+528 694 536 714 513 756 curveto
+505 770 491 781 477 789 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 475 786 moveto
+468 794 lineto
+478 792 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 475 786 moveto
+468 794 lineto
+478 792 lineto
+closepath
+stroke
+end grestore
+
+%	CBbuilder GLUA 110 
+gsave 10 dict begin
+481 522 76 18 ellipse_path
+stroke
+gsave 10 dict begin
+418 517 moveto
+(CBbuilder GLUA 110 )
+[9.36 9.36 6.96 6.96 3.84 3.84 6.96 6.24 4.56 3.6 10.08 8.16 9.12 10.08 3.6 5.76 6.24 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	PeptideBuilder ASNA 111  -> CBbuilder GLUA 110 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 475 576 moveto
+474 568 474 559 474 550 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 477 550 moveto
+475 540 lineto
+471 550 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 477 550 moveto
+475 540 lineto
+471 550 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	CBbuilder GLUA 110  -> PeptideBuilder ASNA 111 
+newpath 487 540 moveto
+488 548 488 557 488 566 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 485 566 moveto
+487 576 lineto
+491 566 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 485 566 moveto
+487 576 lineto
+491 566 lineto
+closepath
+stroke
+end grestore
+
+%	ChiBuilder GLUA 110 
+gsave 10 dict begin
+481 450 78 18 ellipse_path
+stroke
+gsave 10 dict begin
+416 445 moveto
+(ChiBuilder GLUA 110 )
+[9.36 6.96 3.84 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 10.08 8.16 9.12 10.08 3.6 5.76 6.24 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	CBbuilder GLUA 110  -> ChiBuilder GLUA 110 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 475 504 moveto
+474 496 474 487 474 478 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 477 478 moveto
+475 468 lineto
+471 478 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 477 478 moveto
+475 468 lineto
+471 478 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	ChiBuilder GLUA 110  -> CBbuilder GLUA 110 
+newpath 487 468 moveto
+488 476 488 485 488 494 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 485 494 moveto
+487 504 lineto
+491 494 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 485 494 moveto
+487 504 lineto
+491 494 lineto
+closepath
+stroke
+end grestore
+
+%	PeptideBuilder LEUA 112 
+gsave 10 dict begin
+534 378 88 18 ellipse_path
+stroke
+gsave 10 dict begin
+459 373 moveto
+(PeptideBuilder LEUA 112 )
+[7.44 6.24 6.96 3.84 3.84 6.96 6.24 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 8.64 8.64 9.12 10.08 3.6 5.76 6.48 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	ChiBuilder GLUA 110  -> PeptideBuilder LEUA 112 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 494 432 moveto
+500 424 508 413 515 404 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 518 406 moveto
+521 396 lineto
+512 402 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 518 406 moveto
+521 396 lineto
+512 402 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	PeptideBuilder LEUA 112  -> PeptideBuilder ASNA 111 
+newpath 549 396 moveto
+556 406 564 419 568 432 curveto
+581 478 589 498 566 540 curveto
+558 554 544 565 530 573 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 528 570 moveto
+521 578 lineto
+531 576 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 528 570 moveto
+521 578 lineto
+531 576 lineto
+closepath
+stroke
+end grestore
+
+%	CBbuilder ASNA 111 
+gsave 10 dict begin
+534 306 75 18 ellipse_path
+stroke
+gsave 10 dict begin
+471 301 moveto
+(CBbuilder ASNA 111 )
+[9.36 9.36 6.96 6.96 3.84 3.84 6.96 6.24 4.56 3.6 10.08 7.68 9.6 10.08 3.6 5.76 5.76 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	PeptideBuilder LEUA 112  -> CBbuilder ASNA 111 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 528 360 moveto
+527 352 527 343 527 334 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 530 334 moveto
+528 324 lineto
+524 334 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 530 334 moveto
+528 324 lineto
+524 334 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	CBbuilder ASNA 111  -> PeptideBuilder LEUA 112 
+newpath 540 324 moveto
+541 332 541 341 541 350 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 538 350 moveto
+540 360 lineto
+544 350 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 538 350 moveto
+540 360 lineto
+544 350 lineto
+closepath
+stroke
+end grestore
+
+%	ChiBuilder ASNA 111 
+gsave 10 dict begin
+534 234 77 18 ellipse_path
+stroke
+gsave 10 dict begin
+469 229 moveto
+(ChiBuilder ASNA 111 )
+[9.36 6.96 3.84 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 10.08 7.68 9.6 10.08 3.6 5.76 5.76 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	CBbuilder ASNA 111  -> ChiBuilder ASNA 111 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 528 288 moveto
+527 280 527 271 527 262 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 530 262 moveto
+528 252 lineto
+524 262 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 530 262 moveto
+528 252 lineto
+524 262 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	ChiBuilder ASNA 111  -> CBbuilder ASNA 111 
+newpath 540 252 moveto
+541 260 541 269 541 278 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 538 278 moveto
+540 288 lineto
+544 278 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 538 278 moveto
+540 288 lineto
+544 278 lineto
+closepath
+stroke
+end grestore
+
+%	PeptideBuilder LYSA 113 
+gsave 10 dict begin
+586 162 87 18 ellipse_path
+stroke
+gsave 10 dict begin
+512 157 moveto
+(PeptideBuilder LYSA 113 )
+[7.44 6.24 6.96 3.84 3.84 6.96 6.24 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 7.2 9.36 7.2 10.08 3.6 5.76 6.48 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	ChiBuilder ASNA 111  -> PeptideBuilder LYSA 113 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 547 216 moveto
+553 208 560 197 567 188 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 570 190 moveto
+573 180 lineto
+564 186 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 570 190 moveto
+573 180 lineto
+564 186 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	PeptideBuilder LYSA 113  -> PeptideBuilder LEUA 112 
+newpath 601 180 moveto
+608 190 616 203 620 216 curveto
+633 262 641 282 618 324 curveto
+610 338 597 349 583 357 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 581 354 moveto
+574 362 lineto
+584 360 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 581 354 moveto
+574 362 lineto
+584 360 lineto
+closepath
+stroke
+end grestore
+
+%	CBbuilder LEUA 112 
+gsave 10 dict begin
+586 90 75 18 ellipse_path
+stroke
+gsave 10 dict begin
+523 85 moveto
+(CBbuilder LEUA 112 )
+[9.36 9.36 6.96 6.96 3.84 3.84 6.96 6.24 4.56 3.6 8.64 8.64 9.12 10.08 3.6 5.76 6.48 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	PeptideBuilder LYSA 113  -> CBbuilder LEUA 112 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 580 144 moveto
+579 136 579 127 579 118 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 582 118 moveto
+580 108 lineto
+576 118 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 582 118 moveto
+580 108 lineto
+576 118 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	CBbuilder LEUA 112  -> PeptideBuilder LYSA 113 
+newpath 592 108 moveto
+593 116 593 125 593 134 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 590 134 moveto
+592 144 lineto
+596 134 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 590 134 moveto
+592 144 lineto
+596 134 lineto
+closepath
+stroke
+end grestore
+
+%	ChiBuilder LEUA 112 
+gsave 10 dict begin
+586 18 77 18 ellipse_path
+stroke
+gsave 10 dict begin
+521 13 moveto
+(ChiBuilder LEUA 112 )
+[9.36 6.96 3.84 9.36 6.96 3.84 3.84 6.96 6.24 4.56 3.6 8.64 8.64 9.12 10.08 3.6 5.76 6.48 6.96 3.6]
+xshow
+end grestore
+end grestore
+
+%	CBbuilder LEUA 112  -> ChiBuilder LEUA 112 
+gsave 10 dict begin
+0.000 1.000 1.000 edgecolor
+newpath 580 72 moveto
+579 64 579 55 579 46 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 1.000 1.000 edgecolor
+newpath 582 46 moveto
+580 36 lineto
+576 46 lineto
+closepath
+fill
+0.000 1.000 1.000 edgecolor
+newpath 582 46 moveto
+580 36 lineto
+576 46 lineto
+closepath
+stroke
+end grestore
+end grestore
+
+%	ChiBuilder LEUA 112  -> CBbuilder LEUA 112 
+newpath 592 36 moveto
+593 44 593 53 593 62 curveto
+stroke
+gsave 10 dict begin
+solid
+1 setlinewidth
+0.000 0.000 0.000 edgecolor
+newpath 590 62 moveto
+592 72 lineto
+596 62 lineto
+closepath
+fill
+0.000 0.000 0.000 edgecolor
+newpath 590 62 moveto
+592 72 lineto
+596 62 lineto
+closepath
+stroke
+end grestore
+endpage
+showpage
+grestore
+%%PageTrailer
+%%EndPage: 1
+%%Trailer
+%%Pages: 1
+end
+restore
+%%EOF

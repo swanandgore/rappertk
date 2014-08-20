@@ -1,0 +1,21 @@
+
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  GLY   | grep MAP | sed 's/MAP //' > ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  GLU   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  ALA   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  VAL   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  ARG   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  MET   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  ASP   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  ASN   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  PRO   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  LEU   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  HIS   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  GLN   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  SER   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  LYS   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  PHE   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  TYR   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  THR   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  ILE   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  CYS   | grep MAP | sed 's/MAP //' >> ratdata
+python cblauncher.py builders samplers restraints geometry misc mcplacement.py  TRP   | grep MAP | sed 's/MAP //' >> ratdata

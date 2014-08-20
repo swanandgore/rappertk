@@ -1,0 +1,330 @@
+
+import os, shutil, re
+import geometry
+from xray import cif2mtz, uniqueify, sfall, mtz2hkl2, cns_generate, cns_anneal2, sgCCP4toCNS, fft, omitmap, mapman, cns_anneal
+from procrun import proc_run_exitOnError as execCmd
+from xcheck import XrayScorer, XrayRanker
+from data import sgtable
+from evalCAtrace import comparePhiPsiOmegaChi
+from pdbr import protein, isAAres
+import prot2res
+from pref import removeZeroLines
+from pref import fixCNSop
+
+
+
+from data import sgtable , long2shortHM
+from scplacement import SCplacement
+from loopbuild import Multiloop
+import prepareChain
+from stump import getCRYST , getRESO
+
+
+ccp4args = {
+    0: [{"reftype":"restrained",    "wa":0.20,    "breftype":"ISOTROPIC",   "ncyc":20}], #on native
+
+    1: [{"reftype":"unrestrained",  "wa":0.75,    "breftype":"OVER",        "ncyc":20, "assignBfac":[20,30]}, #on catrace
+        {"reftype":"restrained",    "wa":0.75,    "breftype":"ISOTROPIC",   "ncyc":40}], #on catrace
+
+    2: [{"reftype":"restrained",    "wa":0.75,    "breftype":"ISOTROPIC",   "ncyc":20, "assignBfac":[60,90]}],
+    3: [{"reftype":"restrained",    "wa":0.75,    "breftype":"ISOTROPIC",   "ncyc":20, "assignBfac":[60,90]}],
+    4: [{"reftype":"restrained",    "wa":0.75,    "breftype":"ISOTROPIC",   "ncyc":20, "assignBfac":[60,90]}],
+    5: [{"reftype":"restrained",    "wa":0.75,    "breftype":"ISOTROPIC",   "ncyc":20, "assignBfac":[60,90]}],
+    6: [{"reftype":"restrained",    "wa":0.75,    "breftype":"ISOTROPIC",   "ncyc":20, "assignBfac":[60,90]}],
+
+    7: [{"reftype":"restrained",    "wa":0.75,    "breftype":"ISOTROPIC",   "ncyc":20, "assignBfac":[15,25]}],
+    8: [{"reftype":"restrained",    "wa":0.75,    "breftype":"ISOTROPIC",   "ncyc":20, "assignBfac":[15,25]}],
+    9: [{"reftype":"restrained",    "wa":0.75,    "breftype":"ISOTROPIC",   "ncyc":20, "assignBfac":[15,25]}],
+   10: [{"reftype":"restrained",    "wa":0.75,    "breftype":"ISOTROPIC",   "ncyc":20, "assignBfac":[15,25]}],
+   11: [{"reftype":"restrained",    "wa":0.75,    "breftype":"ISOTROPIC",   "ncyc":20, "assignBfac":[15,25]}],
+   12: [{"reftype":"restrained",    "wa":0.50,    "breftype":"ISOTROPIC",   "ncyc":20, "assignBfac":[15,25]}],
+   13: [{"reftype":"restrained",    "wa":0.20,    "breftype":"ISOTROPIC",   "ncyc":20, "assignBfac":[15,25]}],
+   14: [{"reftype":"restrained",    "wa":0.20,    "breftype":"ISOTROPIC",   "ncyc":40, "assignBfac":[ 5, 6]}],
+}
+
+
+cnsArgs = {}
+for cycle in range(20) : cnsArgs[cycle] = {} ; cnsArgs[cycle]["num_cycles"] = 2 ; cnsArgs[cycle]["temperature"] = 5000
+#cnsArgs[0]["wa"] = -1 ; cnsArgs[0]["num_cycles"] = 1 ; cnsArgs[0]["temperature"] = 50
+#cnsArgs[1]["wa"] = -1 ; cnsArgs[1]["num_cycles"] = 1 ; cnsArgs[1]["temperature"] = 50
+
+
+def cnsRefinement(mtzin,pdbin, mtzout,pdbout, a,b,c,alpha,beta,gamma,sg,reso, cnsArgs,cycle, usefreer,f1label,sigf1label,freeRlabel,extraTOPfile=None, extraPARfile=None) :
+    mtz2hkl2(mtzin, "cns.hkl",f1label,sigf1label,freeRlabel)
+    cns_generate(pdbin, "generate.mtf", "generate.pdb", extraTOPfile, extraPARfile, "generate.log")
+    removeZeroLines("generate.pdb") ## ???
+    wa = -1 ; harmCA = None
+    if cnsArgs[cycle].has_key("harmCA") and cnsArgs[cycle]["harmCA"] != None : harmCA = 1
+    cns_anneal2(a, b, c, alpha, beta, gamma, sgCCP4toCNS[sg], reso,
+        "cns.hkl", "generate.mtf", "generate.pdb", extraPARfile, "anneal%d.log"%cycle, wa, cnsArgs[cycle]["num_cycles"], cnsArgs[cycle]["temperature"], harmCA)
+    removeZeroLines("anneal.pdb") ##  ???
+    fixCNSop("anneal.pdb")
+    os.rename("anneal.pdb", pdbout)
+
+    sfall(pdbout, "rfree.mtz", mtzout, reso,usefreer,f1label,sigf1label,freeRlabel)
+    #sfall(, "rfree.mtz", "phased.mtz",options.resolution,usefreer,f1label,sigf1label,freeRlabel)
+    
+    mapman("anneal_2fofc.map", mtzout+"2fofc.map")
+    mapman("anneal_fc.map", mtzout+"fc.map")
+    #moleman(pdbout)
+
+
+def main() :
+
+    import optparse ; parser = optparse.OptionParser()
+    parser.add_option("--dir-xyzout", action='store', type='string', dest='dir_xyzout', help='to create all the files during refinement. it shdnt be already present.')
+    parser.add_option("--xyzin", action='store', type='string', dest='pdbfile', help='starting pdb containing a model of pdb-ligand complex')
+    parser.add_option("--hklin", action='store', type='string', dest='sf', help='structure factors file')
+
+    parser.add_option("--a", action='store', type='float', dest='a', help='cell dimension a')
+    parser.add_option("--b", action='store', type='float', dest='b', help='cell dimension b')
+    parser.add_option("--c", action='store', type='float', dest='c', help='cell dimension c')
+    parser.add_option("--alpha", action='store', type='float', dest='alpha', help='cell angle alpha')
+    parser.add_option("--beta", action='store', type='float', dest='beta', help='cell angle beta')
+    parser.add_option("--gamma", action='store', type='float', dest='gamma', help='cell angle gamma')
+    parser.add_option("--sg", action='store', type='string', dest='sg', help='cell spacegroup, in CCP4 notation')
+    parser.add_option("--resolution", action='store', type='float', dest='resolution', help='resolution of the data')
+    parser.add_option("--use-ca-restraints", action='store', dest='caRes', help='[True/False], Apply positional restraints on the C-alpha atoms',default="True")
+    parser.add_option("--use-sc-restraints", action='store', dest='scRes',type= 'string', help='[True/False],  Apply positional restraints on the centroid of the sidechain atoms',default="True",)
+    parser.add_option("--ca-restraint-radius", action='store', type='float', dest='caRad', help='radius of spherical restraint on CA position', default=1)
+    parser.add_option("--sc-centroid-restraint-radius", action='store', type='float', dest='scRad', help='radius of spherical restraint on sidechain centroid', default=2)
+    parser.add_option("--sidechain-vdw-reduction", action='store', type='float', dest='scReduction', help='factor to reduce effective vdw dist in case of sidechains', default= 0.75)
+    parser.add_option("--population-size", action='store', type='int', dest='popsize', help='population size for PopulationStrategy', default=100)
+
+
+    parser.add_option("--verbose", action='store', type='int', dest='verbose', help='0 means least verbosity etc.', default=0)
+    parser.add_option("--backtrack", action='store', type='string', dest='backtrack', help='use backtracking version of PopulationStrategy. eg 4X5 will set backtrack numsteps and stepsize to 4,5 respectively. not used by default.', default=None)
+    parser.add_option("--rotamerlib", action='store', type='string', dest='rotLib', help='[PRL/SCL1.0/SCL0.5/SCL0.2] Name of rotamer library to use when building side chains ', default='SCL1.0')
+    parser.add_option("--add-sidechains", action='store', type='string', dest='addsc', help='Build missing side chains ', default='False')
+    parser.add_option("--use-given-rotamer", action='store', type='string', dest='userot', help='Use given rotamer', default='False')        
+
+    parser.add_option("--randomize", action='store', type='int', dest='randomize', help='seed for randomizing', default=None)
+
+    parser.add_option("--mconly", action='store', type='string', dest='mconly', help='[True/False] Build mainchain only', default="False")
+    parser.add_option("--sconly", action='store', type='string', dest='sconly', help='[True/False] Build side chains only, can only be used when MAP/MTZ file is given. See web page for further details', default="False")
+
+    parser.add_option("--opsax", action='store', type='string', dest='opsax', help='[True/False] Reassign side chains with OPSAX, will only be used when MTZ or MAP file is given', default="True")
+
+    parser.add_option("--attempts", action='store', type='int', dest='natt', help='Number of attempts made to build section', default=5)
+
+    parser.add_option("--cacaCutoff", action='store', type='float', dest='cacaCutoff', help='Minimum distance ( angstrom ) between adjacent Calpha atoms in order to detect a chain-break', default=5.)
+
+
+    #################    Electron density parameters ####################################
+    
+
+    
+    parser.add_option("--FP", action='store', type='string', dest='f1label', help='Column label for FP in MTZ file', default=None)
+    parser.add_option("--SIGFP", action='store', type='string', dest='sigf1label', help='Column label for sigFP in MTZ file', default=None)
+    parser.add_option("--FC", action='store', type='string', dest='f2label', help='Column label for FC in MTZ file', default=None)
+    parser.add_option("--PHIC", action='store', type='string', dest='phiclabel', help='Column label for PHIC in MTZ file', default=None)
+    parser.add_option("--use-FreeR", action='store', type='string', dest='usefreer', help='[True/False] Use FreeR set ? ', default="False")
+    parser.add_option("--FreeR", action='store', type='string', dest='freeRlabel', help='Column label for FreeR in MTZ file', default=None)
+    parser.add_option("--n", action='store', type='int', dest='n', help='Value of n for difference map calculations nFo-(n-1)Fc', default=2)
+
+
+    ############# Residues to be modelled ####################################
+    
+
+
+
+
+
+
+    parser.add_option("--rebuild-poor-regions-only", action='store', type='string', dest='poorOnly', help='[True/False] Rebuild regions ofinput structure with poor fit to an electron density map. Residues to be rebuilt are identified using a real space correlation coefficientscore, the cut-off for which is set using --poor-fit-threshold.', default="False")
+    parser.add_option("--poor-fit-threshold", action='store', type='float', dest='poorThreshold', help='Correlation coefficient threshold to identify poor fitting regions', default=0.9)
+
+
+
+    parser.add_option("--loopseq", action='store', type='string', dest='loopres', help='Amino acid sequence for loop to be built', default=None)
+    parser.add_option("--use-loopclosure-restraints", action='store', type='string', dest='closure', help='Use geometric restraints to ensure closure of loop with anchor residues', default= "True")
+    parser.add_option("--start", action='store', type='int', dest='start', help='Residue number to start building from ', default=None)
+    parser.add_option("--stop", action='store', type='int', dest='stop', help='Residue number to stop building at', default=None)
+    parser.add_option("--chainid", action='store', type='string', dest='chainid', help='Chain ID of section to be built.', default=None)
+    parser.add_option("--modelN2C", action='store', type='string', dest='modelN2C', help='[True/False] Model fragment without loop closure restraints. Used in conjunction with --start, --stop, --chainid. Requires --use-ca-restraints True ', default="False")
+
+    ######### Ouptut parameters #############################################
+
+    parser.add_option("--models-get-native-bfactors", action='store', type='string', dest='nativeBfac', help='[True/False] Assign B-factors of remodelled atoms to original values', default="False")
+    parser.add_option("--default-mainchain-b-factor", action='store', type='float', dest='mcBfac', help='The value of B-factor assigned to the newly built main chain atoms', default=20.)
+    parser.add_option("--default-sidechain-b-factor", action='store', type='float', dest='scBfac', help='The value of B-factor assigned to the newly built side chain atoms', default=30.)
+
+
+
+    ### Electron density parametets #########################################
+
+    parser.add_option("--minimum-sig", action='store', type='float', dest='minXSig', help='Minimum sigma ', default=0.25)
+    parser.add_option("--maximum-sig", action='store', type='float', dest='maxXSig', help='Maximum sigma ', default=2.0)
+
+
+
+    ########## Optional restraints ##########################################
+    
+    parser.add_option("--make-ed-optional", action='store', type='string', dest='edOpt', help='[True/False]  If False, then the mainchain will be unconditionally forced to lie in positive density. If True then positive density restraint on the mainchain will be made optional.This is useful when tracing through a structure with regions in very poor (non-existent) density', default= "False")
+
+    parser.add_option("--make-all-restraints-optional", action='store', type='string', dest='allOpt', help='[True / False ]  If True, then all  restraints will be made optional', default="False")    
+    
+    parser.add_option("--start-inscode", action='store', type='string', dest='startcode', help='Residue number to start building from ', default=' ')
+    parser.add_option("--stop-inscode", action='store', type='string', dest='stopcode', help='Residue number to stop building at', default=' ')
+    
+    parser.add_option("--mapformat", action='store', type='string', dest='mapformat', help='Value of n for difference map calculations nFo-(n-1)Fc', default="cns")
+
+    (options, args) = parser.parse_args()
+
+
+
+
+
+
+    if not os.path.isdir(options.dir_xyzout) : os.mkdir(options.dir_xyzout)
+    shutil.copyfile(options.pdbfile, "%s/0.model0.pdb" % options.dir_xyzout)
+    #    shutil.copyfile(options.sf, "%s/rfree.mtz" % options.dir_xyzout)
+    shutil.copyfile(options.sf, "%s/rfree.mtz" % options.dir_xyzout)
+    os.chdir(options.dir_xyzout)
+
+
+
+    if (options.a == None or options.b == None or options.c == None or options.alpha == None or options.beta == None or options.gamma == None) :
+        options.a,options.b,options.c,options.alpha , options.beta , options.gamma,d1  = getCRYST(options.pdbfile)
+        
+        if (options.a == None or options.b == None or options.c == None or options.alpha== None or options.beta==None or options.gamma == None ):
+            print "CRYST card cannot be read from coordinate file. Please input cell paramater a, b , c , alpha, beta , gamma = ",options.a , options.b , options.c , options.alpha , options.beta  , options.gamma 
+            import sys ; sys.exit()
+
+
+
+            
+    if options.sg == None : 
+        d1,d2,d3,d4 , d5 , d6, options.sg  = getCRYST(options.pdbfile)
+        if options.sg == None : 
+            print "Please input space group " , options.sg ; import sys ; sys.exit()
+        ss = ""
+        for sg1 in options.sg:
+            if sg1 in ["\n","\t","\s"]:
+                continue
+            else :
+                ss = ss+sg1
+        options.sg = ss
+                
+    if options.sg  in long2shortHM.keys():
+        shortsg = long2shortHM[options.sg]
+        options.sg = shortsg
+    if options.sg not in sgtable.keys():
+        print "Check --sg , Not recognised [%s][%d]"%( options.sg, len(options.sg))
+        import sys ; sys.exit()
+
+    if options.resolution == None : 
+        options.resolution = getRESO(options.pdbfile)
+        if (options.resolution == None):
+            print "Please input resolution " , options.resolution
+            import sys ; sys.exit()
+
+
+
+
+
+    numRefCycles = 20 ; startCycle = 0
+
+
+    if options.sconly == 'True':
+        numRefCycles = 10 ; startCycle = 0
+
+    for cycle in range(startCycle, numRefCycles) :
+        cnsout = "cns%d.pdb" % cycle
+        rtkmodel = "model%d.pdb" % (cycle+1) # rappertk model to be generated in this cycle
+        if os.path.isfile(cnsout) and os.path.isfile(rtkmodel) :
+            continue
+        xscorecutoff = options.poorThreshold
+
+        if options.sconly != 'True':
+            if cycle == 15 : options.scRad *= 2 
+
+
+        if options.sconly == 'True':
+            if cycle > 5  :
+                options.userot = 'True' 
+            else :
+                options.userot = 'False'
+
+                
+
+            
+            #if cycle < 10 : xscorecutoff = 0.8
+            #else :                xscorecutoff = 0.9
+
+
+
+
+        #if cycle == 0 :
+        #   scvdwr = .75 ; options.popsize = 500
+
+        
+        modelIn = "0.model%d.pdb" % cycle
+
+
+        cnsout = "cns%d.pdb" % cycle
+        rtkmodel = "model%d.pdb" % (cycle+1) # rappertk model to be generated in this cycle
+
+        #uniqueify("base.mtz", "rfree.mtz",0.1)
+        
+        if options.f2label != None and options.phiclabel != None and cycle == 0 :
+            shutil.copyfile("rfree.mtz", "phased.mtz")
+            
+        else :
+            print options.f1label
+
+            sfall(modelIn, "rfree.mtz", "phased.mtz",options.resolution,options.usefreer,options.f1label,options.sigf1label,options.freeRlabel)
+
+        phasedmtz = "phased%d.mtz" % cycle # phase the str factors with current model
+        #cnsphasedmtz = "phased%d.mtz" % cycle # phase the str factors with current model
+
+        
+        if not os.path.isfile(cnsout) :
+            cnsRefinement("phased.mtz", modelIn, phasedmtz, cnsout,
+                          options.a, options.b, options.c, options.alpha, options.beta, options.gamma, options.sg, options.resolution,
+                          cnsArgs, cycle,options.usefreer,options.f1label,options.sigf1label,options.freeRlabel)
+
+
+
+            if cycle >= 4 :
+                if os.path.isfile("phased%d.mtz2fofc.map"%(cycle-2)):
+                    os.remove("phased%d.mtz2fofc.map"%(cycle-2))
+
+                if os.path.isfile("phased%d.mtzfc.map"%(cycle-2)):
+                    os.remove("phased%d.mtzfc.map"%(cycle-2))
+
+                if  os.path.isfile("phased%d.mtz"%(cycle-2)):
+                    os.remove("phased%d.mtz"%(cycle-2))
+                #os.remove("anneal_fc.map_%d"%(cycle-2))
+                if  os.path.isfile("anneal_2fofc.map_%d"%((numRefCycles-1)-cycle+4)) : 
+                    os.remove("anneal_2fofc.map_%d"%((numRefCycles-1)-cycle+4))
+
+                if  os.path.isfile("anneal_fc.map_%d"%((numRefCycles-1)-cycle+4)) : 
+                    os.remove("anneal_fc.map_%d"%((numRefCycles-1)-cycle+4))
+
+                if  os.path.isfile("generate.mtf_%d"%((numRefCycles-1)-cycle+4)) : 
+                    os.remove("generate.mtf_%d"%((numRefCycles-1)-cycle+4))
+
+                if  os.path.isfile("generate.pdb_%d"%((numRefCycles-1)-cycle+4)) : 
+                    os.remove("generate.pdb_%d"%((numRefCycles-1)-cycle+4))                    
+
+        from pref15 import main as  prefRapperMain
+        
+        #sfall(cnsout, phasedmtz , cnsphasedmtz)
+        
+        prefRapperMain(cnsout,rtkmodel,options.dir_xyzout,None,phasedmtz,options.caRes,options.scRes,options.caRad,options.scRad,options.scReduction,options.popsize,options.verbose,options.backtrack,options.rotLib,1,options.mconly,options.sconly,options.opsax,options.natt,options.cacaCutoff,options.a,options.b,options.c,options.alpha,options.beta,options.gamma,options.sg,options.resolution,options.f1label,options.sigf1label,"FC","PHIC",options.usefreer,options.freeRlabel,options.n,options.poorOnly,xscorecutoff,options.loopres,options.start,options.startcode,options.stop,options.stopcode,options.chainid,options.modelN2C,options.nativeBfac,options.mcBfac,options.scBfac,options.minXSig,options.maxXSig,options.edOpt,options.allOpt,options.closure,options.addsc,options.userot,options.mapformat)
+        
+#        prefRapperMain(cnsout,rtkmodel,options.dir_xyzout,None,phasedmtz,options.caRes,options.scRes,options.caRad,options.scRad,scvdwr,popsize,options.verbose,options.backtrack,rotlib, 1 , "False", "False" , "True" , 5 , 5.0 ,options.a,options.b,options.c,options.alpha,options.beta,options.gamma,options.sg,options.resolution,"FP","SIGFP",None,None,"True","FreeR_flag",2,"True",xscoreCutoff,None,None,None,None,"False","False",20.0,30.0,0.25,2.0,"False","False")
+        
+
+if __name__ == "__main__" :
+    main()
+    import sys ; sys.exit(0)
+    from scplacement import SCplacement
+    import prepareChain
+    scPrepC, useGivenRot, useDEE = prepareChain.PrepareChain("PRL"), 1, 1
+    badresids = ["VAL   85 ", "ASP   86 ", "TYR   68 ", "TYR   90 ",],
+    SCplacement("premodel2.pdb", 0.5, "mmm.pdb", "dotfile", useDEE, "phased1.mtz2fofc.map", "FP", "FC", "PHIC", "2F1-F2", 0, 5, None, useGivenRot,
+        badresids, scPrepC).run()
+    import sys ; sys.exit(0)
+    replaceWaters("model1.pdb", "rtk0.map")

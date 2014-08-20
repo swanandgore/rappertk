@@ -1,0 +1,8 @@
+
+ ## protlig
+python ~/rtk152-O4/appscripts-acer/cblauncher.py cif2mtz --scratchdir  ~/rtk152-O4/test/1w98_mtz  --sf 1w98-sf.cif  --pdb 1W98.pdb 
+
+python $RTKROOT/appscripts-acer/cblauncher.py protlig   --ligfile ~/rtk152-O4/test/msq.ligdesc   --xyzin ~/rtk152-O4/test/1di9.pdb   --xyzout models.pdb   --ca-restraint-radius 1.   --sc-centroid-restraint-radius 5.   --sidechain-vdw-reduction 0.75   --population-size 100   --num-models 1   --verbose 6   --around-ligand 10   --hklin  ~/rtk152-O4/test/1di9_mtz/1DI9.mtz  --dir-xyzout ~/rtk152-O4/test/1di9_protlig 
+
+
+## prot prot interface

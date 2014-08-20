@@ -1,0 +1,131 @@
+<html>
+
+<head>
+<title>RapperTK Webpage</title>
+<link rel="stylesheet" href="rappertk.css" type="text/css">
+<LINK REL="shortcut icon" HREF="rtklogo.ico">
+</head>
+
+
+<h2>
+<table width=100%>
+<tr>
+
+<td align=left><img STYLE="height: 5Em;" src=rtklogo.gif></td>
+
+<td align=right>
+<table>
+<tr><td>
+<a href=http://www.cam.ac.uk><img STYLE="height: 3Em;" src=camlogo.gif></a>
+<a href=http://www-cryst.bioc.cam.ac.uk><img STYLE="height: 3Em;" src=lablogo.jpg></a>
+</td></tr>
+<tr><td>
+<font color=White face=sans-serif size=5>
+<i>RapperTK Home</i>
+</font>
+</td></tr>
+</table>
+</td>
+
+</tr>
+</table>
+</h2>
+
+<h1>Welcome!</h1><p>
+
+RapperTK is a versatile toolkit for conformational sampling under restraints. It is a generalization of Rapper (Depristo, deBakker et.al.)
+developed by <a href=http://www-cryst.bioc.cam.ac.uk/~swanand>Swanand Gore</a> at Prof Sir Tom Blundell's lab, Crystallography and Biocomputing Group, Department of Biochemistry, University of Cambridge.<br>
+
+
+<h1>Download</h1>
+
+Downoad and use of this software is free for academic users and only for academic use (<a href=../rtk.tgz>download</a>).<br>
+Other users need to <a href=mailto:swanand@gmail.com,sg363@cam.ac.uk,tom@cryst.bioc.cam.ac.uk>contact</a> us and get a licensed copy.<br>
+Note that this software comes with no explicit or implied warranty.
+
+
+<h1>Installation</h1>
+
+<ul>
+    <li>
+        Note that we develop and use RapperTK generally with following setup :
+        <ul>
+            <li>Suse Linux 10.0</li>
+            <li>g++ (GCC) 4.0.2 20050901 (prerelease) (SUSE Linux)</li>
+            <li>GNU Make 3.80</li>
+            <li><a href=http://www.python.org>Python 2.4</a></li>
+            <li><a href=http://www.swig.org>SWIG 1.3.28</a></li>
+            <li><a href=http://www.ysbl.york.ac.uk/~cowtan/clipper/clipper.html>Clipper libraries</a> for crystallography (Kevin Cowtan, last ChangeLog entry 31/08/05)</li>
+        </ul>
+        We expect that things will work smoothly even if you have later versions of any of these properly installed. If not, we will troubleshoot your problems and make an entry in FAQs.
+    </li>
+    <li>Download the RapperTK distribution and uncompress it (tar xvzf rappertk.tgz) to get rappertk directory and get into that directory (cd rappertk).</li>
+    <li>Run 'make check' to see the environment variables that need to be setup, and set them. Use the rappertk/usertk file to enter these environment variables and next time just source usertk.</li>
+    <li>Run 'make clobber ; make depend ; make'. After this, run 'make' again to check if everything was compiled correctly.</li>
+    <li>Run 'make tests' to run all testcases and verify that rappertk is running properly on your machine.</li>
+    <li><a href=mailto:rappertk@googlegroups.com>Report</a> problems or desirable feature additions by mailing rappertk-at-googlegroups.com.</li>
+</ul>
+
+
+<h1>Usage examples</h1>
+
+Each directory in rappertk/tests is an illustration of rappertk applied to some problem.
+Additionally it contributes a testcase to the testsuite (executed by 'make tests').
+testscr file in every directory of in rappertk/tests/ contains the command and README contains explanation.<br>
+Note that electron density restraints can be applied in almost every case optionally.<br>
+Following is a listing of examples in rappertk/tests with brief description.<p>
+
+<table border=1>
+
+<tr>
+<td><b><i>Task</i></b></td>
+<td><b><i>Directory</i></b></td>
+<td><b><i>Description</i></b></td>
+</tr>
+
+<tr>
+<td>CA tracing</td>
+<td>catrace</td>
+<td>If you know approximate location of CA atoms and sidechains in a poypeptide, use this command to trace your structure through those restraints.
+Trace can be done in forward or reverse directions, in a simple or restraint-guided way, and with or without sidechains.</td>
+</tr>
+
+<tr>
+<td>CA tracing in electron density</td>
+<td>xcatrace</td>
+<td>This is similar to catrace, but a map or mtz can be provided to put electron density restraints. Strictness of electron-density restraints can also be specified.</td>
+</tr>
+<tr>
+
+<td>Protein-RNA interface sampling</td>
+<td>protrna</td>
+<td>Protein loops close to RNA are identified. Both RNA and protein are then sampled within the specified positional restraints. Can be done within electron density also.</td>
+</tr>
+
+<td>Protein-ligand interface sampling</td>
+<td>protlig</td>
+<td>Same as protein-RNA. Ligand's flexibility has to be described in a file formatted in certain syntax.</td>
+</tr>
+
+<td>Protein-protein interface sampling</td>
+<td>ppi</td>
+<td>Similar to protein-RNA. Loops on each domain close to another are identified and sampled.</td>
+</tr>
+
+<tr>
+<td>Loop building</td>
+<td>loop</td>
+<td>There is a loop closure procedure which closes the loop. Can be executed within positional and Xray restraints.</td>
+</tr>
+
+<td>Sampling in simulated EM data using secondary structure</td>
+<td>ssEM</td>
+<td>This is actually a secondary-structure-sensitive way of CA-tracing. Secondary structure has to be provided in a file formatted to a particular syntax. Additionally electron-density can
+be provided as map file, along with positional reatraints. Loops are excluded from positional restraints.</td>
+</tr>
+
+</table>
+
+<hr>
+
+</html>

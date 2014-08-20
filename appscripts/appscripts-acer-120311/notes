@@ -1,0 +1,14 @@
+Water and other HETATMS are ignored during the model building procedure. They are copied from the gien coordinate file into the output file at the end of a round of model building.
+Only the standard amino acids and MSE are reccognised. All other modified reidues are treated as follows:
+(1) If --use-ca-restraint False : The residue will be skipped and the program will attempt to link the adjoining residues.
+(2) If --use-ca-restraint True : The residue will be skipped and will be treated as a chain break.
+These residues will treated similar to a HETATM entry and will be copied into the output file at the end of the model building procedure.
+
+
+NOTE ON MISSING ATOMS.
+If calpha atoms are missing and --use-ca-restraints is set to true, then only residues for which ca-atoms are present in the coordinate file will be rebuilt. the residues with missing ca-atoms will treated as chain breaks howeer clash checks will be performed by keeping the atoms of these residues fixed.
+
+If calpha atoms are missing and --use-ca-restraints is set to False, 
+(1) If loopseq is not gien then all residues represented in the coordinate file within the range specified will be rebuilt.
+(2) If loopseq is gien, residues will be rebuilt according the sequence and residue range specified. 
+

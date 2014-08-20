@@ -1,0 +1,17 @@
+## This is a ligand description file for MSQ in 1di9.pdb for using with rappertk.
+## Bondlengths and angles are not changed by rappertk, only rotatable bonds are rotated with given range and stepsize in degrees.
+## everything following a # is ignored. all blank lines ignored
+
+ligname MSQ
+
+init .2 .2 [ C14] [ N12] #initialize C14 N12 within 2A of positions given in pdb file
+
+rotbond -180 175 30 [ N12] [ C14] [ C15] [ C16] [ C17] [ C18] [ C19] [ S21] [ C22] # rotate C15 onwardsaround C14-N32 bond by any multiple of 30, >= -180 and < 175
+rotbond -180 175 30 [ C16] [ S21] [ C22]
+rotbond -180 175 30 [ C14] [ N12] [ N1 ] [ C2 ] [ N3 ] [ C4 ] [ C5 ] [ C6 ] [ C7 ] [ C8 ] [ C9 ] [ C10] [ O26] [ C27] [ O31] [ C32]
+rotbond -180 175 30 [ C8 ] [ O26] [ C27]
+rotbond -180 175 30 [ C9 ] [ O31] [ C32]
+
+mindist 5 [ C16] [ C32] # a ligand conformation must have mindist of 5A between these 2 atoms
+mindist 5 [ C17] [ C27]
+mindist 5 [ C10] [ C19]

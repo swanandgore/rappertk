@@ -1,0 +1,35 @@
+DEPTH = ../
+SUBDIRS =
+
+LINCFLAGS += $(RTKROOT)/geometry/_geometry.so $(RTKROOT)/misc/_misc.so
+
+CSOURCES = PhipsiSampler OmegaSampler NAsampler NAsuiteSampler InformedPhipsiSampler RATdata \
+            BBdepChiSampler PRLsampler RapSampler SCLsampler FragSampler
+ISOURCES = samplers
+SWIGLIB = samplers
+
+-include $(DEPTH)/makedefs
+# DO NOT DELETE
+
+BBdepChiSampler.o: BBdepChiSampler.h /usr/local/xtal/rtk152-O4/misc/RanGen.h
+FragSampler.o: FragSampler.h Sampler.h
+FragSampler.o: /usr/local/xtal/rtk152-O4/misc/RanGen.h
+InformedPhipsiSampler.o: InformedPhipsiSampler.h RATdata.h
+InformedPhipsiSampler.o: /usr/local/xtal/rtk152-O4/geometry/functions.h
+InformedPhipsiSampler.o: /usr/local/xtal/rtk152-O4/misc/RanGen.h
+InformedPhipsiSampler.o: /usr/local/xtal/rtk152-O4/misc/verbosity.h
+NAsampler.o: NAsampler.h /usr/local/xtal/rtk152-O4/misc/RanGen.h
+NAsuiteSampler.o: NAsuiteSampler.h /usr/local/xtal/rtk152-O4/misc/RanGen.h
+NAsuiteSampler.o: /usr/local/xtal/rtk152-O4/misc/verbosity.h
+OmegaSampler.o: /usr/local/xtal/rtk152-O4/misc/RanGen.h OmegaSampler.h
+OmegaSampler.o: Sampler.h
+PhipsiSampler.o: /usr/local/xtal/rtk152-O4/misc/RanGen.h PhipsiSampler.h
+PhipsiSampler.o: Sampler.h
+PRLsampler.o: PRLsampler.h BBdepChiSampler.h
+PRLsampler.o: /usr/local/xtal/rtk152-O4/misc/RanGen.h
+PRLsampler.o: /usr/local/xtal/rtk152-O4/misc/verbosity.h
+RapSampler.o: RapSampler.h /usr/local/xtal/rtk152-O4/misc/RanGen.h
+RATdata.o: /usr/local/xtal/rtk152-O4/misc/verbosity.h RATdata.h
+SCLsampler.o: SCLsampler.h /usr/local/xtal/rtk152-O4/misc/RanGen.h
+SCLsampler.o: /usr/local/xtal/rtk152-O4/geometry/functions.h
+SCLsampler.o: /usr/local/xtal/rtk152-O4/misc/verbosity.h

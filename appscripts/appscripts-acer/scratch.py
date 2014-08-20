@@ -1,0 +1,570 @@
+
+
+    if dir_xyzout == None : print "Directory for output files --dir_xyzout needs to be set. ",dir_xyzout; import sys ; sys.exit()
+    if  os.path.isfile(dir_xyzout) : print dir_xyzout,"Is a file, Please rename output directory" ;  import sys ; sys.exit()
+    dir_xyzout = fixdirnames(dir_xyzout)
+
+
+    head,tail  = os.path.split(dir_xyzout)
+
+    if head and os.path.isdir(head):
+        print "Checking for directory ............",head
+    else:
+        print "%s does not exists"%head
+        import sys ; sys.exit()
+
+    if not os.path.isdir(dir_xyzout) :
+        os.mkdir(dir_xyzout)
+
+    os.chdir(dir_xyzout)
+
+
+    if pdbout == None : print "Output filename needs to be set."; import sys ; sys.exit()    
+    if (os.path.isdir(pdbout) == True )  : print "Output Coordinate file %s is a directory"%pdbout; import sys ; sys.exit()
+    pdbout = fixdirnames(pdbout)
+    head,tail  = os.path.split(pdbout)
+    if head != "" : pdbout = tail
+
+    if (os.path.isfile("%s/%s" % (dir_xyzout,"modelinit.pdb"))==True) :
+        os.remove("%s/%s" % (dir_xyzout,"modelinit.pdb"))
+    if  pdbfile == None : print "Please specify input coordinates file %s " % pdbfile ; import sys ;        sys.exit()
+    if (os.path.isdir(pdbfile) == True )  : print "Input Coordinate file %s is a directory"%pdbfile; import sys ; sys.exit()
+    pdbfile = fixdirnames(pdbfile)
+    if (os.path.isfile(pdbfile)==False)  :        print "Cannot find file %s " %pdbfile ; import sys ;        sys.exit()
+
+
+
+    shutil.copyfile(pdbfile, "%s/%s" % (dir_xyzout,"modelinit.pdb"))
+    modelIn =  "modelinit.pdb" ;    rtkmodel = pdbout 
+
+
+
+
+    #### Initializations  ####
+    opsaxoff = None ; guidedsampling = None;    scvdwr = scReduction ;   
+    xrayRestGen = [] ;    badresids = [] ;         nullres = [] ; missingpts = {}
+    misc.setVerbosity(verbose) 
+    randomize(1)
+    str2bool = {"False": 0 , "True":1}
+        
+
+    ###########     CHECKS  FOR INTEGRITY OF INPUT VALUES                    #############################
+
+    mconly =  str2bool[mconly]
+    sconly =  str2bool[sconly]
+    opsax =  str2bool[opsax]
+    usefreer =  str2bool[usefreer]
+    nativeBfac =  str2bool[nativeBfac]
+
+    caRes =  str2bool[caRes]
+    scRes =  str2bool[scRes]
+    edOpt =  str2bool[edOpt]
+    allOpt =  str2bool[allOpt]
+    userot = str2bool[userot]
+    
+
+    if mconly == 0 :        mconly = None
+    if addsc == 0 :         addsc = None
+    if userot  == 0 :       userot = None
+    if allOpt == 1 :        edOpt = 1
+    if caRes == 0 :         scRes = 0
+    
+
+    ########### CHECK FOR AVAIALABLE CELL PARAMETERS, SPACE GROUP and RESOLUTION
+
+    if (mapfn !=  None or mtzfn !=None ):
+        from stump import getCRYST , getRESO
+
+        if (a == None or b == None or c == None or alpha == None or beta == None or gamma == None) :
+            print "Getting cell paramters from coordinate file....."
+            a,b,c,alpha , beta , gamma,d1  = getCRYST(pdbfile)
+            if (a == None or b == None or c == None or alpha == None or beta == None or gamma == None ):
+                print "CRYST card cannot be read from coordinate file. Please input cell paramater a, b , c , alpha, beta , gamma = ",a , b , c , alpha , beta  , gamma 
+                import sys ; sys.exit()
+            print "Found a b c alpha beta gamma  ", a , b , c , alpha , beta  , gamma 
+
+        if sg == None : 
+            print "Getting space group from coordinate file....."
+            d1,d2,d3,d4 , d5 , d6, sg  = getCRYST(pdbfile)
+            if sg == None : 
+                print "Please input space group " , sg ; import sys ; sys.exit()
+        ss = ""
+        for sg1 in sg:
+            if sg1 in ["\n","\t","\s"]:
+                continue
+            else :
+                ss = ss+sg1
+        sg = ss
+        if sg  in long2shortHM.keys(): shortsg = long2shortHM[sg];  sg = shortsg
+        if sg not in sgtable.keys(): print "Check --sg , Not recognised [%s]"%sg ;            import sys ; sys.exit()
+        print "Setting Space Group to",sg
+        
+        if resolution == None : 
+            print "Getting resolution limit from coordinate file........"
+            resolution = getRESO(pdbfile)
+            if (resolution == None):
+                print "Please input resolution using --resolution value, currently" , resolution ; import sys ; sys.exit()
+            print "Resolution = [ " , resolution, " ] "
+
+
+
+    ############### CHECK RESTRAINT INFORMATION  ######################
+
+
+    if caRes == 0 : print "\n********** WARNING!! In loop building mode, No C-alpha positional restraints will be used";caRad = None; 
+    if scRes == 0 : print "********** WARNING!! No sidechain centroid positional restraints will be used"; scRad = None
+
+
+    chainsFound  = getChains(pdbfile)    
+    if  chainid != None and  chainid not in chainsFound : 
+        print "Chain id not found in pdb file", chainid , chainsFound ; import sys ; sys.exit()
+
+
+
+
+
+
+
+    if  mapfn != None and mtzfn != None :
+        
+        print "********** WARNING!! both mtz and map file given, please only give either MTZ file or MAP file  *************"
+        import sys ; sys.exit()
+
+    if  mapfn != None:
+        if (os.path.isfile("%s/%s" % (dir_xyzout,"init.map"))==True) :
+            os.remove("%s/%s" % (dir_xyzout,"init.map"))        
+        useomitmap,usecnsmap,useccp4map  = None,None,None
+        esmin, esmax, esmean, rcmult, xscoreCutoff = minXSig, maxXSig, .0, 5, poorThreshold
+        mapfilepath= mapfn
+        if (os.path.isfile(mapfilepath)==False) :
+            print "Cannot find file %s " %mapfn ; import sys ;            sys.exit()
+        if  "map" not in mapfn : 
+            print "Cannot understand i/p map format,the file should be  (*.map) format " ; import sys ; sys.exit()
+        from xray import mapdump
+        if  mapdump(mapfn)  == None :
+            print "Check format of map file, needs to be CCP4 format";
+            import sys ;              sys.exit()            
+
+
+        shutil.copyfile(mapfilepath, "%s/init.map" % (dir_xyzout))
+        ccp4map = mapfn
+
+    elif mtzfn != None :
+        if (os.path.isfile("%s/%s" % (dir_xyzout,"init.mtz"))==True) :
+            os.remove("%s/%s" % (dir_xyzout,"init.mtz"))            
+        mtzfilepath= "%s"%(mtzfn)
+        esmin, esmax, esmean, rcmult, xscoreCutoff = minXSig, maxXSig, .0, 5, poorThreshold
+        
+        if (os.path.isfile(mtzfilepath)==False) :
+            print "Cannot find file %s " %mtzfn ; import sys ;sys.exit()
+        if  "mtz" not in mtzfn : 
+            print "Cannot understand i/p HKLIN format,the file should be in mtz (*.mtz) format " ; import sys ; sys.exit()
+
+
+        shutil.copyfile(mtzfilepath, "%s/init.mtz" % (dir_xyzout))
+        mtzfilepath = "%s/init.mtz" % (dir_xyzout)
+
+
+        ################   COPY MtZ COLOUMN LABELS  #########################################
+        from xray import mtzdump
+
+        if (f1label == None):
+            print "Please specify FP label  " , f1label ; import sys ; sys.exit()
+        if (sigf1label == None):
+            print "Please specify SIGFP label  " , sigf1label ; import sys ; sys.exit()
+            
+        if usefreer == 1 : 
+            if freeRlabel == None :
+                print "If you would like to use the freeR set, please specify column name for freeR"
+                import sys ; sys.exit()
+            
+        
+        if  mtzdump(mtzfn,f1label,sigf1label,freeRlabel,f2label,phiclabel)  == None :
+            print "Check structure factor file, format needs to be MTZ"
+            import sys ;              sys.exit()            
+            
+
+        if (f2label == None or phiclabel == None ):
+            print "Column labels for  FC and PHIC  not specified, will use input coordinate structure to obtain FC and PHIC"
+
+            
+            if sfall(pdbfile, mtzfn, "phased.mtz",resolution,usefreer,f1label,sigf1label,freeRlabel) == None :
+                
+                print "Structure factor file cannot bephased , please enter column labels for  FC and PHIC"
+                import sys ; sys.exit()
+            
+            mtzfn  = "phased.mtz"
+            f2label  = "FC" ; phiclabel = "PHIC"
+
+
+
+        ### MAKE UNWEIGHTED DIFF MAP : todo sigmaA weighted maps #########################
+
+        from xray import fftnew
+        useomitmap,usecnsmap,useccp4map  = None,None,None
+        if mapformat == "cns": usecnsmap = 1
+        elif mapformat == "omit": useomitmap = 1
+        elif mapformat == "2fofc": useccp4map = 1
+        else : print "Unrecognised mapformat ,exiting" ; import sys; sys.exit()
+            
+        if useccp4map == 1 or useomitmap   == 1 :
+            fofcmap = "%s%dFo-%dFC.map"%(mtzfn,n,((n)-1))
+            fcmap = "%sFC.map"%mtzfn
+            mapfn = fofcmap
+            if usefreer == 1 : 
+                fftnew(mtzfn, fofcmap, pdbfile,f1label,f2label,phiclabel,sigf1label,n,(n)-1,freeRlabel)
+                fftnew(mtzfn, fcmap, pdbfile ,f1label,f2label,phiclabel,sigf1label,0,1,freeRlabel,1)
+            else :
+                fftnew(mtzfn, fofcmap, pdbfile , f1label,f2label,phiclabel,sigf1label,n,(n)-1,None)
+                fftnew(mtzfn, fcmap, pdbfile ,f1label,f2label,phiclabel,sigf1label,0,1,freeRlabel,1)
+
+
+
+        if useomitmap == 1 :
+            omit_mapfile = "%s%dFo-%dFC.omit.map"%(mtzfn,n,((n)-1))
+            mapfn = omit_mapfile 
+            if usefreer == 1 : 
+                omitsucc = omitmap(mtzfn, omit_mapfile, f1label,f2label,phiclabel,sigf1label,n,(n)-1,freeRlabel)
+            else :
+                omitsucc = omitmap(mtzfn, omit_mapfile, f1label,f2label,phiclabel,sigf1label,n,(n)-1)
+            if omitsucc == None :
+                useomitmap = 0
+                useccp4map = 1
+                mapfn = fofcmap
+        if usecnsmap == 1 :
+            fofcmap = mtzfn+"2fofc.map"
+            fcmap = mtzfn+"fc.map"
+            mapfn = fofcmap
+            
+        
+
+    ############### SET UP   ######################
+    if (mapfn !=  None or mtzfn !=None ):
+        esmin, esmax, esmean, rcmult, xscoreCutoff = minXSig, maxXSig, .0, 5, poorThreshold
+        mapcoeff = "%dF1-%dF2"%(n, n-1)
+        xrayRestGen.append( prepareChainV5.XrayRestraintsGenerator(mapfn, "map", f2label, phiclabel, mapcoeff, esmin, esmax, esmean, [], edOpt ) )
+
+    
+
+    ############### GENERATE MODELS  ######################
+
+    multiPrepC = prepareChainV5.PrepareChain(rotLib)
+    for  i in range(nmodels):
+        nb = 0 ; cp1 = 0
+
+        if nmodels == 1 > 1 :
+            outpdb = "pre."+str(i)+"."+rtkmodel
+            outpdbsc = str(i)+"."+rtkmodel
+        else :
+            outpdb = "pre."+rtkmodel
+            outpdbsc = rtkmodel
+
+        if (caRad != None and caRad < 0.49) :
+            print "Minimum Ca-radii needs to be 0.5 ANGSTROM."
+            
+            if nmodels > 1 : 
+                print "Copying", pdbfile ,  " to ","pre."+rtkmodel 
+                shutil.copyfile(pdbfile, "pre."+rtkmodel)
+            else :
+                print "Copying", pdbfile ,  " to ","pre."+str(i)+"."+rtkmodel 
+                shutil.copyfile(pdbfile, "pre."+str(i)+"."+rtkmodel)
+            nb = 1
+            
+            cp1 = 1 
+        
+        elif ( ( (badresids != None and  len(badresids) > 0  and poorOnly ==  1 ) or (poorOnly == 0 and badresids == None ) or (poorOnly == 0 and len(badresids) > 0) ) and sconly == 0 ):
+            print "\nGenerating MODEL %d of %d asked for ..........."%(i+1,nmodels)
+
+
+            ml = Multiloop(modelIn, badresids, mconly, caRad, scRad, scvdwr, guidedsampling, popsize, backtrack, 1 , outpdb, xrayRestGen, multiPrepC,sconly, cacaCutoff,nullres,modelN2C,natt,missingpts,1,allOpt,edOpt,None,addsc) 
+            
+            ml.ranker = None 
+            if poorOnly == 1 :
+                ml.poor = "poor"
+            if start != None and stop != None and chainid != None :
+                ml.loopstartnum = start
+                ml.loopstopnum = stop
+                ml.loopclosure = closure
+
+
+            if mtzfn != None or mapfn !=None:
+                ml.ranker = XrayRanker(mapfn, "map", f2label, phiclabel, mapcoeff, esmin, esmax)
+                ml.ranker.rankChildren = rcmult ; ml.ranker.rankRecurse = 1
+                ml.ranker.rankLeaderBuilderOnly = None ; ml.ranker.rankGivenEnsemble = None
+                ml.cellsym = [ a, b, c, alpha, beta, gamma, sgtable[sg][0] ]
+
+                
+            nb,built,unbuilt = ml.run()
+
+            print "\n\n==================================== BUILD REPORT ====================================\n\n"
+            for ub in unbuilt[0]:
+                for bands in ub :
+                    if bands != [] :
+                        print 
+                        print "BAND : [%s] to [%s] could not be built (%s) "%(bands[0],bands[1],bands[2])
+                        print 
+
+            for ub in built[0]:
+                for bands in ub :
+                    if bands != [] :
+                        print 
+                        print "Successfully generated coordinates for BAND : [%s] to [%s] (%s) "%(bands[0],bands[1],bands[2])                
+                        print 
+
+
+
+            print "\n\n==================================== BUILD REPORT ENDS ================================\n\n"
+            removeMODEL(outpdb)
+            
+                
+        else :
+            cp1 = 1
+            shutil.copy(pdbfile, outpdb)
+
+        from copyheader import copyheader
+        if  sconly == 1 and opsax == 0 and mapfn != None :
+            print "** In order to rebuild sidechains set --opsax True ** "
+            if cp1 != 1 : 
+                removeMODEL(outpdb) ## automatic water addition can go here
+                copyheader(outpdb,"modelinit.pdb")
+                copyNonprotein(pdbfile,outpdb)
+                adjustBfac2(outpdb, pdbfile,nativeBfac, mcBfac, scBfac)
+            import sys ; sys.exit()
+
+
+        if  sconly == 1 and opsax == 1 and mapfn == None :
+            print "** In order to rebuild sidechains using opsax MTZ/MAP file required ** "
+            if cp1 != 1 : 
+                removeMODEL(outpdb) ## automatic water addition can go here
+                copyheader(outpdb,"modelinit.pdb")
+                copyNonprotein(pdbfile,outpdb)
+                adjustBfac2(outpdb, pdbfile,nativeBfac, mcBfac, scBfac)
+            import sys ; sys.exit()
+
+        if sconly == 1 and opsax == 0 and mapfn == None :
+            print "** In order to rebuild sidechains for given backbone :  "
+            print "** (1) Give MTZ/MAP file  ** "
+            print "                 or          "
+            print "** (2) Generate all atom model using --ca-restraint-radius 0.5 --use-ca-restraints True **  "
+
+            if cp1 != 1 :
+                removeMODEL(outpdb) ## automatic water addition can go here
+                copyheader(outpdb,"modelinit.pdb")
+                copyNonprotein(pdbfile,outpdb)
+                adjustBfac2(outpdb, pdbfile,nativeBfac, mcBfac, scBfac)
+                
+            import sys ; sys.exit()            
+
+
+        if sconly == 1 and opsax == 1 and mapfn != None and opsaxoff == 1 :
+            print "Cannot use opsax for proteins > 200 aminoacids, try  rebuilding all atoms :"
+            print "--sconly False --ca-restraint-radius 0.5 --use-ca-restraints True "
+            if cp1 != 1 :
+                removeMODEL(outpdb) ## automatic water addition can go here
+                copyheader(outpdb,"modelinit.pdb")
+                copyNonprotein(pdbfile,outpdb)
+                adjustBfac2(outpdb, pdbfile,nativeBfac, mcBfac, scBfac)
+                
+            import sys ; sys.exit()
+
+            
+            
+        if opsax == 0 or mapfn == None or mconly == 1 or opsaxoff == 1:
+            removeMODEL(outpdb) ## automatic water addition can go here
+            copyheader(outpdb,"modelinit.pdb")
+            copyNonprotein(pdbfile,outpdb)
+            adjustBfac2(outpdb, pdbfile,nativeBfac, mcBfac, scBfac)
+            shutil.copyfile(outpdb, outpdbsc  )
+            print "Renaming", outpdb, " to ", outpdbsc
+
+        elif  badresids != None and len(badresids)==0 and poorOnly == 0 and sconly != 1 :
+            removeMODEL(outpdb) ## automatic water addition can go here
+            copyheader(outpdb,"modelinit.pdb")
+
+            copyNonprotein(pdbfile,outpdb)
+            adjustBfac2(outpdb, pdbfile,nativeBfac, mcBfac, scBfac)
+            shutil.copyfile(outpdb, outpdbsc  )
+            print  "Renaming", outpdb, " to ", outpdbsc
+            print "WARN!! Nothing to be rebuilt, renaming", outpdb, " to ", outpdbsc
+            
+            
+        elif  nb != 1 and sconly !=1 : 
+            removeMODEL(outpdb) ## automatic water addition can go here
+            copyheader(outpdb,"modelinit.pdb")
+            copyNonprotein(pdbfile,outpdb)
+            adjustBfac2(outpdb, pdbfile,nativeBfac, mcBfac, scBfac)
+            shutil.copyfile(outpdb, outpdbsc  )
+            print  "Renaming", outpdb, " to ", outpdbsc
+            print "WARN!! Nothing to be rebuilt, renaming", outpdb, " to ", outpdbsc
+
+
+
+        else :
+        
+            print "\n\nStarting OPSAX ........"
+            if badresids == None :
+                prot = protein(pdbfile, read_hydrogens=0, read_waters=0, read_hets=0)
+                res, resids, resnums, resns, chids, inscodes, pts = prot2res.readProtRes(prot)
+                badresids = list( resids.values() )
+                
+
+            if cp1 == 1 and  poorOnly == 1 :
+                badresids = list(  set( badscs )  )
+                print "B2"
+
+            elif cp1 == 1  and poorOnly == 0 :
+                badresids = badresids
+                print "B3"
+
+            elif ((len(badresids)==0 and poorOnly == 1 )  or (sconly == 1 and poorOnly == 1)):
+                print "B4"
+                badresids = list(  set( badscs )  )
+
+            elif poorOnly == 1 :
+                
+                if len(unbuilt[0]) == 0  :
+                    badresids = list(  set(  findChangedSC(pdbfile, outpdb) + badscs )  )
+                    print "B5"
+                else :
+                    badresids = list(  set( badscs )  )
+                    print "B6"
+
+            elif   poorOnly == 0 and sconly != 1 and len(unbuilt[0]) == 0   :
+                badresids = list(  set(  findChangedSC(pdbfile, outpdb) )  )
+                print "B7"
+                
+            elif   poorOnly == 0 and sconly != 1 and len(unbuilt[0]) != 0  :
+                badresids = list(  set(  findChangedSC(pdbfile, outpdb) )  )
+                print "B8"
+            else:
+                badresids = badresids
+                print "B9"
+                ### todo remove missing sidechains ??
+
+
+            if len(badresids) == 0:
+                print "No residues marked for OPSAX"
+                
+                shutil.copyfile(outpdb , outpdbsc)
+            elif len(badresids) > 250:
+                
+                print "Length of section > 250 residues, can not perform OPSAX"
+                shutil.copyfile(outpdb , outpdbsc)
+
+            else :
+
+
+                scPrepC, useGivenRot, useDEE = prepareChainV5.PrepareChain("PRL"), userot , 1
+
+                if mapfn != None : 
+                    nb2 = SCplacement(outpdb, scReduction, outpdbsc, "dotfile", useDEE, mapfn, f1label, f2label , phiclabel, mapcoeff, esmin, esmax, addsc, useGivenRot, badresids, scPrepC).run()
+                if nb2 != 1:
+                    shutil.copyfile(outpdb , outpdbsc)
+            print "\n Finished OPSAX ........"
+
+        adjustBfac2(outpdb, pdbfile,nativeBfac, mcBfac, scBfac)
+        adjustBfac2(outpdbsc, pdbfile,nativeBfac, mcBfac, scBfac)
+
+        removeMODEL(outpdbsc) ## automatic water addition can go here
+        removeMODEL(outpdb) ## automatic water addition can go here
+        
+        copyNonprotein(pdbfile,outpdbsc) ## automatic water addition can go here
+        copyNonprotein(pdbfile,outpdb)
+
+        copyheader(outpdb,"modelinit.pdb")
+        copyheader(outpdbsc,"modelinit.pdb")
+        
+        print "------------------------------------ MODEL ASSESSMENT --------------------------------"
+        
+        if mtzfn != None :
+            from prefRapperV4WithRefmac import refmacNew
+            from protRefine_nick import molProbity_badres, add_cryst_card 
+
+
+            sfcheck(mtzfn,pdbfile,f1label,sigf1label,freeRlabel ) 
+            if (os.path.isfile("sfcheck.log")==False) :
+                print "no sfcheck file ";
+                
+            else :
+                head1,tail1  = os.path.split(pdbfile) ; sfcheckfile0 = "sfcheck.%s.log"%tail1
+                shutil.copyfile("sfcheck.log",sfcheckfile0)
+                
+
+            if sfall(outpdbsc, mtzfn, "phased."+str(i)+".mtz",resolution,usefreer,f1label,sigf1label,freeRlabel ) == None :
+                print "sfall failed"
+                import sys ; sys.exit()
+            sfcheck(dir_xyzout+"/phased."+str(i)+".mtz", outpdbsc,f1label,sigf1label,freeRlabel ) 
+
+            if (os.path.isfile("sfcheck.log")==False) :
+                print "no sfcheck file ";
+                
+            else :
+                prefix = outpdbsc ; sfcheckfile1 = "sfcheck.%s.log"%prefix
+                os.rename("sfcheck.log",sfcheckfile1)
+
+            
+            sfall(outpdb, mtzfn, "phased.pre."+str(i)+".mtz",resolution,usefreer,f1label,sigf1label,freeRlabel ) 
+            sfcheck(dir_xyzout+"/phased.pre."+str(i)+".mtz",outpdb,f1label,sigf1label,freeRlabel ) 
+
+
+            if (os.path.isfile("sfcheck.log")==False) :
+                print "no sfcheck file ";
+            else :
+                prefix = outpdb; sfcheckfile2 = "sfcheck.%s.log"%prefix
+                os.rename("sfcheck.log",sfcheckfile2)
+
+            
+
+
+            print
+            print
+            print "R-factor and correlation for initial coordinates"
+            parse_sfcheck_logfile(sfcheckfile0,pdbfile)
+            print
+
+            print
+            print
+            print "R-factor and correlation for output (rappertk) coordinates before opsax"
+            parse_sfcheck_logfile(sfcheckfile2,outpdb)
+
+            
+                       
+            print
+            print "R-factor and correlation for output (rappertk) coordinates"
+            parse_sfcheck_logfile(sfcheckfile1,outpdbsc)
+
+
+
+
+
+
+        elif mapfn != None :
+            from prefRapperV4WithRefmac import refmacNew
+            from protRefine_nick import molProbity_badres, add_cryst_card 
+            from copyheader import copyheader
+
+
+            sfcheck(mapfn,pdbfile,None,None,None)
+            os.rename("sfcheck.log","sfcheck.init.log")
+            
+            sfcheck(mapfn, outpdbsc,None,None,None)
+            os.rename("sfcheck.log","sfcheck."+str(i)+".log")
+
+            print
+            print
+            print "R-factor and correlation for initial coordinates"
+            parse_sfcheck_logfile("sfcheck.init.log",pdbfile)
+            print
+            print
+            print "R-factor and correlation for output (rappertk) coordinates"
+            parse_sfcheck_logfile("sfcheck."+str(i)+".log",outpdbsc)
+
+
+        print "------------------------------------ MODEL ASSESSMENT ENDS ---------------------------"
+
+
+
+
+
+
+

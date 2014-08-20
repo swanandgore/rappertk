@@ -1,0 +1,57 @@
+                    prevstop   = loops[k][0]
+
+                    for r in range (len(lchbr)) :
+                        if  lchbr[r]- prevstop <= 2:
+                            if skip == 0 :
+                                for xx in range(prevstop+1, lchbr[r]) : 
+                                    notbuilding.append(resnums[xx]);
+                                    print "Notbuilding..A1",xx,resids[xx]
+                            else :
+                                for xx in range(prevstop , lchbr[r]) : 
+                                    notbuilding.append(resnums[xx]);
+                                    print "Notbuilding..A2",xx,resids[xx]
+                            prevstop = lchbr[r]
+                            print "Putting prevstop to",lchbr[r],resids[prevstop]
+                            skip = 1
+                            continue                
+
+                        if r == 0 :
+                            wholenewloops.append([prevstop,lchbr[r]])
+                            print "Dadad 1 -------------",resids[prevstop],resids[lchbr[r]]
+                            wholenewlooptypes.append("NtoC")
+                            prevstop = lchbr[r]
+                            skip = 0
+                        elif  skip == 0 : 
+                            wholenewloops.append([prevstop+1,lchbr[r]])
+                            print "Dadad 2 -------------",resids[prevstop+1],resids[lchbr[r]],skip
+                            wholenewlooptypes.append("NtoC")
+                            prevstop = lchbr[r]
+                            skip = 0
+                        elif skip == 1 :
+                            wholenewloops.append([prevstop,lchbr[r]])
+                            print "Dadad 3 -------------",resids[prevstop],resids[lchbr[r]]
+                            wholenewlooptypes.append("NtoC")
+                            prevstop = lchbr[r]
+                            skip = 0
+                            
+
+
+
+                    if  loops[k][1] - prevstop < 2: 
+                        if skip == 1:
+                            for xx in range(prevstop,loops[k][1]+1):
+                                notbuilding.append(resnums[xx]);
+                                print "Notbuilding..1.",resids[xx]
+                        else :
+                            for xx in range(prevstop+1,loops[k][1]+1):
+                                notbuilding.append(resnums[xx]);
+                                print "Notbuilding..2.",resids[xx]
+                    else :
+                        if skip == 1:
+                            wholenewloops.append([prevstop,loops[k][1]])
+                            wholenewlooptypes.append("NtoC")
+                            print "Dadad last1  -------------",resids[prevstop],loops[k][1]
+                        else :
+                            print "Dadad last2  -------------",resids[prevstop+1],loops[k][1]
+                            wholenewloops.append([prevstop+1,loops[k][1]])
+                            wholenewlooptypes.append("NtoC")

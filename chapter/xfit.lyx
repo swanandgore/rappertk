@@ -1,0 +1,243 @@
+#LyX 1.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 221
+\textclass article
+\language english
+\inputencoding auto
+\fontscheme default
+\graphics default
+\paperfontsize default
+\papersize Default
+\paperpackage a4
+\use_geometry 0
+\use_amsmath 0
+\use_natbib 0
+\use_numerical_citations 0
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\quotes_times 2
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+
+\layout Title
+
+Optimal sidechain packing in proteins and crystallographic refinement
+\layout Section
+
+Introduction
+\layout Standard
+
+Sidechains are important for protein function and dynamics.
+ They are relatively more exposed, hence more flexible than the mainchain.
+ They are physicochemically more diverse than mainchain.
+ Sidechains exhibit rotamericity, the tendency to adapt one of few distinct
+ conformations.
+ Packing of sidechains in proteins is studied in great detail.
+ These studies reveal that sidechains can be tightly packed like a jigsaw
+ puzzle in protein core, whereas surface sidechains are generally unconstrained.
+\layout Standard
+
+In homology modeling, it is observed that mainchains for target can be calculate
+d more reliably than sidechains, or sidechain conformations are not as well
+ conserved as mainchain from templates to target.
+ While there is information in templates about target's sidechains, target
+ also has its own excluded volume constraints.
+ To find the optimal balance between excluded volume, rotamericity and informati
+on in template, optimal sidechain placement methods were devised.
+ These methods use techniques in combinatorial optimization and are capable
+ of finding global minimum of a hybrid function consisting of self-energy
+ of rotameric states (derived from rotameric probability and say, templates)
+ and pairwise energies (say, van der Waal energy between rotamers of two
+ sidechains close to each other).
+ Prominent among these methods are dead-end elimination, brach-and-bound
+ and greaph decomposition.
+\layout Standard
+
+Sidechain optimization has not been applied yet to X-ray crystallographic
+ refinement, but various scenarios can be imagined in which it may be useful.
+ For instance, fragments of mainchain can be approximately located in low-qualit
+y data, but sidechains are hard to identify due to intermingled densities.
+ To make things more difficult, sequence registry also may be hard to identify.
+ Various guesses about registry can be rapidly and automatically checked
+ by sidechain placement followed by a short annealing cycle.
+ Since sidechain placement methods are not sequential, rotamer selection
+ is not biased by the search order and there is better chance of finding
+ optimal conformations for interacting sidechains separated in sequence.
+ Sidechain placement can be used also to quickly identify the sidechain
+ heterogeneity/inaccuracy in a model.
+ Sidechain-replaced model can be refined to identify the residues at which
+ data supports alternate sidechain conformations.
+\layout Section
+
+This work
+\layout Standard
+
+In this paper, we describe the implementation of SCWRL-like sidechain optimizati
+on strategy in RapperTK.
+ We validate this implementation by testing whether a reasonable sidechain
+ assignment can be generated with this program on mainchains of different
+ quality.
+ As a control, we refine without optimal sidechain assignment also and compare
+ the refinement statistics.
+ As reported later, we find that sidechain optimization is more valuable
+ than CNS-only protocol.
+ Then we validate the technique in the scenario where sequence registry
+ is not available and mainchain is approximate and demonstrate that sequence
+ registry can be reliably identified.
+ Finally we consider the scenario where mainchain is approximate and incomplete,
+ and registry is unknown.
+ Thus we assess the value of optimal sidechain placement for crystallographic
+ refinement.
+\layout Section
+
+Sidechain reassignment algorithm
+\layout Standard
+
+This procedure is inspired by SCWRL, a popular program for optimal sidechain
+ reassignment.
+ For clarity and completeness, we describe the procedure briefly.
+\layout Itemize
+
+For each sidechain, steric clashes of all rotamers with mainchain are checked
+ and clashing rotamers are removed.
+\layout Itemize
+
+Removing rotamers with Goldstein DEE : For a sidechain, a set of neighbouring
+ sidechains which may sterically clash with it are identified.
+ Then two rotamers 
+\begin_inset Formula a, b
+
+\end_inset 
+
+ of this sidechain are compared by checking : 
+\begin_inset Formula \begin{eqnarray*}
+(a,i)-(b,i)+\sum_{j\gtrless i}^{Nbrs}min_{c}\{(a,i,c,j)-(b,i,c,j)\} & > & 0\end{eqnarray*}
+
+\end_inset 
+
+where 
+\begin_inset Formula (a,i)
+
+\end_inset 
+
+ is the self-energy of the rotamer 
+\begin_inset Formula a
+
+\end_inset 
+
+ of residue 
+\begin_inset Formula i
+
+\end_inset 
+
+ and 
+\begin_inset Formula (a,i,c,j)
+
+\end_inset 
+
+ is the pairwise energy of rotamer 
+\begin_inset Formula a
+
+\end_inset 
+
+ of residue 
+\begin_inset Formula i
+
+\end_inset 
+
+ and rotamer 
+\begin_inset Formula c
+
+\end_inset 
+
+ of residue 
+\begin_inset Formula j
+
+\end_inset 
+
+.
+ If this relation holds, then rotamer 
+\begin_inset Formula a
+
+\end_inset 
+
+ is said to be dominated by rotamer 
+\begin_inset Formula b
+
+\end_inset 
+
+ and is removed from further calculations.
+\layout Itemize
+
+Sidechains with possibility of steric clash are connected to form a sidechain
+ graph.
+ Biconnected components are identified in this graph along with their articulati
+on nodes (collapse nodes).
+ Biconnected components are ordered for collapse.
+\layout Itemize
+
+Collapsing the ordered components with a branch-and-bound technique : In
+ order to avoid visiting all possible rotamer assignments for the components,
+ at each stage of the search, the best possible energy from unassigned nodes
+ in the component is calculated in the context on currently assigned nodes.
+ This is the bounding energy :
+\begin_inset Formula \begin{eqnarray*}
+E_{bound} & = & \sum_{i>j}min_{a}(i,a)+\sum_{i>j}\sum_{k\leqslant j}min_{a,b}(i,a,k,b)\end{eqnarray*}
+
+\end_inset 
+
+If 
+\begin_inset Formula E_{j}+E_{bound}>E_{best}
+
+\end_inset 
+
+, then the current subtree of search is abandoned as it is not possible
+ to obtain a solution better than already known from that subtree.
+ When a components is solved, the internal energy of each rotamer of its
+ articulation node is changed to the minimum energy of the component when
+ articulation node has that rotameric state.
+\layout Itemize
+
+By traversing in reverse direction of component order, complete assignment
+ is calculated - this is the global minimum assignment for this energy function.
+\layout Section
+
+Preliminary Validation
+\layout Standard
+
+Our favourite testcase is interleukin-beta (PDB id 9ilb).
+ Deposited structure factors were phased with just mainchain and the sidechain
+ placement was done with rotameric self-energy defined as 
+\begin_inset Formula 2FoFc
+
+\end_inset 
+
+ occupancy score and pairwise van der Waal clash energy defined as 0 when
+ not clashing and infinite when clashing.
+ When refined for 3 cycles of CNS, we found that the structure refined to
+ Rfree of 
+\begin_inset Formula 0.26
+
+\end_inset 
+
+, which is decent considering that native Rfree with CNS is 
+\begin_inset Formula 0.24
+
+\end_inset 
+
+.
+ The same procedure was repeated with 
+\layout Section
+
+Identification of sequence registry
+\layout Section
+
+Sequence registry for incomplete models
+\layout Section
+
+Conclusions
+\the_end

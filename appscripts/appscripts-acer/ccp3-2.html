@@ -1,0 +1,503 @@
+﻿<html>
+<head><title>CCP4 Program Suite: Rappertk</title></head>
+<body>
+<!-- ::INDEX_INFO::Rappertk::Supported::Density Fitting, Model -->
+<!-- Building,Ensemble generation::Conformer -->
+<!-- sampling :::::::: -->
+<H1> Rappertk (CCP4: Supported Program)</H1>
+<H2> NAME</H2>
+<b>Rappertk </b>
+- Macromolecular modelling by sampling from phi-psi maps and rotamer
+libraries under experimental and knowledge-based restraints.
+<H2> SYNOPSIS</H2>
+<b>rappertk </b>  <i>  mode  [Key-worded input] </i>
+
+<H2><a name="description">DESCRIPTION</a></H2>
+<P>Rappertk is a toolkit for knowledge-based conformational sampling of
+protein structures under user specified restraints.  It is a
+generalization of the program RAPPER and can be used for
+fitting an all-atom model into the density map using approximate C-alpha atom positions,
+fitting rotameric sidechains to a mainchain-only model and for modelling loop regions.  It can also be
+used to sample protein-protein and protein-ligand interface regions and  generate an ensemble of conformers.
+</P>
+
+
+
+
+<H2><a name="running">HOW TO RUN RAPPERTK</a></H2>
+
+<b> rappertk </b>  <i>  mode  [Key-worded input] </i>
+<br>
+<P> One of the following three modes can be used depending on the modelling application. <br>
+ <b> protmodel </b>  <br> 
+For all model building applications including chain tracing, sidechain modelling and loop building with or without using density information. <br>
+<b> protint </b>  <br> 
+For sampling protein-protein interfaces. <br>
+ <b> protlig  </b>  <br>
+For sampling protein-ligand interfaces. <br>
+</P>
+
+
+<H2><a name="files">INPUT AND OUTPUT FILES</a></H2>
+<H3> Input</H3>
+<p>
+All file names are given as keyworded inputs. The complete path needs to be given for all input files.  </p>
+<dl compact>
+<dt> <b> --xyzin </b>  <i> filename </i> </dt> 
+<dd> [Required] Input coordinates file (in PDB format). </dd> 
+
+<p> <i> For crystallographic model building </i>
+<br> Either a phased MTZ file or a MAP file can be given but not both. </p>
+
+<dt> <b> --hklin </b>  <i> filename </i>    </dt> 
+<dd> [Optional]   Input phased MTZ file. The required columns are FP and SIGFP. If the file does not contain calculated structure factor amplitudes and phases FC and PHI then it will be calculated from the input coordinates file.Corresponding column labels need to be set using the keywords --FP, --SIGFP, --FC and --PHI.  </dd> 
+
+<dt> <b> --mapin </b> <i> filename </i>  </dt> 
+<dd> [Optional] Input map file (CCP4 format). Currently only CCP4 format maps are supported. Maps in other formats can be converted using MAPMAN. </dd> 
+
+<br>
+
+<i> For protein-ligand interface sampling </i>
+<dt> <b> --ligfile </b> <i> filename </i>   </dt> 
+<dd> [Required only when using the <b> protlig </b> mode]. File containing the ligand description. </dd> 
+
+</dl>
+<H3> Output</H3>
+<dl compact>
+
+<dt> <b> --dir-xyzout  </b> <i> dirname </i>  </dt> 
+<dd> [Required] The directory to which all output files will be written. </dd> 
+
+<dt> <b> --xyzout  </b> <i> filename </i>   </dt> 
+<dd> [Required] Default="modelout.pdb". Output PDB file. If the number of models specified is greater than one then each model will be written to a seperate file with the model number prepended to the specified filename. </dd> 
+</dl>
+
+
+
+
+
+
+<H2><a name="keywords">KEYWORDED INPUT</a></H2>
+<P> Keywords are  mode specific and a complete list of keywords can be
+obtained by typing <b> rappertk <i> mode </i> --help</b>. Note the 
+double dash "--" before each keyword name.
+</P>
+
+<B> General </B>
+<dl>
+
+
+<dt> <B> --sidechain-vdw-reduction </B> <i> float </i>    </dt> 
+<dd> Default=1.0. This is the factor by which the  effective van der Waals interaction
+distance will be reduced when one or both are sidechain atoms. A value of 0.75 is optimal. </dd> 
+<dt> <B> --population-size </B> <i> int </i>  </dt> 
+<dd> Default is 100. Population size of conformers to be maintained at each residue extension
+step. Usually the default value of 100 is appropriate. 
+
+</dd> 
+<dt> <B> --verbose </B>  <i> int </i>   </dt> 
+<dd> Default=6. Can range from 1 (least verbose) to 10 (most verbose). </dd> 
+
+<dt> <B> --backtrack </B> <i> attemptsXsteps </i>    </dt> 
+<dd> Default=4X5. If model building fails at a particular residue point then the
+program backtracks to a previously built residue and starts sampling
+again. The number of backtracking attempts is specified using <i> attempts </i> and the number of residues by which the program backracks is set using <i>steps</i>.
+eg a value of 4X5 will backtrack by 5 residues and a total of 4 backtracking attempts will be made. </dd> 
+
+<dt> <B> --randomize </B>  <i> int </i>    </dt> 
+<dd> Default=None. Seed for randomizing </dd> 
+
+<dt> <B> --num-models  </B> <i> int </i>    </dt> 
+<dd> Default=1. Number of models to be built  </dd> 
+
+<dt> <B> --chainids </B>  <i> chainid </i>  </dt> 
+<dd> Default=' '. Chain/s to be traced. For multiple chains can be given as 'chainid1chainid2 ...'. For example to trace chains A and B set --chainid to AB. </dd> 
+
+<dt> <B> --mconly </B>  <i> True/False </i>    </dt> 
+<dd> Default=False. If set to True mainchain-only models will be generated. </dd> 
+
+<dt> <B> --sconly </B> <i> True/False </i>  </dt> 
+<dd> Default=False. If set to True only sidechains atoms will be rebuilt. </dd> 
+
+
+<dt> <B> --add-sidechains </B> <i> True/False </i>  </dt> 
+<dd> Default=False. Can be used when building only side chains (i.e. --sconly True).If set to True missing side chains atoms can be added by setting --add-sidechains True. Note: If building all atoms (i.e. --sconly False) then missing sidechain atoms in the region to be built will be added by default. </dd> 
+
+
+<dt> <B> --use-given-rotamer  </B> <i> True/False </i>  </dt> 
+<dd> Default=False. Used in conjunction with --sconly True. If set to True, the current sidechain will be scored against all sampled rotamers, and if a higher scoring rotamer is found then the sidechain group will be replaced. If set to False, the highest scoring sampled sidechain will be selected irrespective of the initial side chain group.  </dd> 
+
+
+
+<dt> <B> --ca-restraint-radius </B>  <i> float </i>    </dt> 
+<dd> Default=2.0. Radius of spherical restraint on the C-alpha atom position. </dd> 
+
+<dt> <B> --sc-centroid-restraint-radius </B>  <i> float </i>   </dt> 
+<dd> Default=3.0. Radius of spherical restraint on the centroid of the sidechain atoms. </dd> 
+
+
+<dt> <B> --attempts </B>  <i> int  </i>   </dt> 
+<dd> Default=5. Number of attempts made to build each residue segment.  </dd> 
+
+<dt> <B> --rotamerlib </B>  <i> rotamer library to use  </i>   </dt> 
+<dd> Default=PRL. Options are PRL, SCL1.0, SCL0.5 or SCL0.2. Name of rotamer library to use when building side chains. The Penultimate Rotamer library (see Reference 4) is appropriate for most applications. The fine grained SCL (see Reference 4) libraries can be used when the mainchain is close to the native conformation. </dd> 
+
+</dl>
+
+
+<B> Crystallographic Model Building </B>
+<dl>
+
+<i> Loop building </i>
+
+<dt> <B> --loopseq  </B> <i> sequence of loop </i>   </dt> 
+<dd> Single letter amino acid sequence of the loop region to be built. </dd> 
+
+<dt> <B> --start </B> <i> start residue of loop </i>   </dt> 
+<dd> Residue number to start building from. </dd> 
+
+<dt> <B> --stop  </B> <i>  stop residue of loop  </i>   </dt> 
+<dd> Residue number to stop building at. </dd> 
+
+
+<dt> <B> --start-inscode </B> <i> insertion code start residue of loop </i>   </dt> 
+<dd> Default=' '. Insertion code of start residue. </dd> 
+
+<dt> <B> --stop-inscode  </B> <i> insertion code of stop residue of loop  </i>   </dt> 
+<dd> Default=' '. Insertion code of stop residue. </dd> 
+
+
+
+<dt><B> --use-loopclosure-restraints </B>  <i> True/False </i>    </dt> 
+<dd> Default=True. Use geometric restraints to ensure closure of loop with anchor residues. </dd> 
+
+<dt> <B> --default-mainchain-b-factor  </B> <i> float </i>    </dt> 
+<dd>  Default=20. The value of B-factor assigned to modelled mainchain atoms </dd> 
+
+<dt> <B> --default-sidechain-b-factor  </B> <i> float </i>   </dt> 
+<dd> Default=30. The value of B-factor assigned to modelled sidechain atoms </dd> 
+
+<dt> <B> --models-get-native-bfactors  </B> <i> True/False </i>    </dt> 
+<dd> default=True. If set to True the B-factors for the modelled residues are taken from the input PDB file. </dd> 
+
+<dt>  <B> --cacaCutoff  </B> <i> float </i>   </dt> 
+<dd> Default=5.0. If distance between adjacent C-alpha atoms exceeds the --cacaCutoff threshold (Angstroms) a chain break
+will be detected. If the input structure contains missing mainchain (non C-alpha)/sidechain atoms then these are added by the program. If the the input file contains missing C-alpha atoms the program treats them as chain breaks and will not build those residues. If residues with no C-alpha coordinate information need to be built, see the Loop Modelling section below. </dd> 
+
+
+
+
+</dl>
+<br>
+The following parameters need to be assigned when using density restraints (input MAP/MTZ file).
+<br>
+<dl>
+<dt> <B> --a  </B> <i> float </i>  </dt> 
+   <dd> Cell dimension a </dd> 
+<dt> <B> --b  </B> <i> float </i>  </dt> 
+   <dd> Cell dimension b </dd> 
+<dt> <B> --c  </B> <i> float </i>  </dt> 
+   <dd> Cell dimension c </dd> 
+
+<dt> <B> --alpha  </B> <i> float </i>  </dt> 
+   <dd> Cell angle alpha </dd> 
+<dt> <B> --beta  </B> <i> float </i>  </dt> 
+   <dd> Cell angle beta </dd> 
+<dt> <B> --gamma  </B> <i> float </i>  </dt> 
+   <dd> Cell angle gamma </dd> 
+
+<dt> <B> --sg  </B> <i> space group </i>  </dt> 
+<dd> Spacegroup in CCP4 notation </dd> 
+
+<dt> <B> --resolution  </B> <i> float </i>  </dt> 
+<dd> Resolution of the data </dd> 
+
+<dt> <B> --FP  </B> <i> FPlabel </i>   </dt> 
+<dd> Column label of observed F in input MTZ file. </dd> 
+
+<dt> <B> --FC  </B> <i> FClabel </i>   </dt> 
+<dd> Column label of calculated F in input MTZ file. </dd> 
+
+<dt> <B> --PHI  </B> <i> PHIlabel </i>   </dt> 
+<dd> Column label of phases in input MTZ file.</dd> 
+
+
+
+<dt> <B> --make-ed-optional  </B> <i> True/False </i>    </dt> 
+<dd> Default=False. If True then electron density restraints will be made optional. By default all atoms are required
+   to lie in positive density. This option can be set to True when building regions having weak density </dd> 
+
+<dt> <B> --make-all-restraints-optional </B> <i> True/False </i>    </dt> 
+<dd> Default=False. If True then all restraints applied will be made optional.</dd> 
+
+
+
+<dt> <B> --poor-fit-threshold  </B> <i> correlation coefficient score </i>    </dt> 
+<dd> Default=0.9. Correlation coefficient threshold to identify ill-fitting regions. </dd> 
+
+<dt> <B> --opsax  </B> <i> True/False </i>  </dt> 
+<dd>  Default=True. When set to False OPSAX optimisation for sidechains will not be used. Using OPSAX results in better R-values. OPSAX will be automatically turned off if length of the modelled region exceeds 200 residues.  </dd>
+ 
+<dt> <B> --rebuild-poor-regions-only  </B> <i> True/False </i>    </dt> 
+<dd> Default=False. When set to True regions that have a  poor fit to the electron density map are identified using a real space correlation score and are rebuilt. The cut-off can be set using <B> --poor-fit-threshold </B>.  </dd> 
+
+<dt> <B> --minimum-sig  </B> <i> minimum sigma </i>   </dt> 
+<dd> Default=0.25. Only if atoms lie in density with greater standard deviation than the  <i> minimum sigma </i> value are given a positive score otherwise the electron density score is penalised. </dd> 
+
+<dt> <B> --maximum-sig </B> <i> maximum sigma </i>  </dt> 
+<dd> default=2.0. If atoms lie in density with greater standard deviation than the <i> maximum sigma </i> value, the electron density score is penalised. </dd> 
+
+
+
+
+</dl>
+
+<B> Protein-Protein Interface Sampling  </B>
+<dl>
+<dt> <B> --close-cutoff  </B> <i> distance cutoff in Angstroms </i>    </dt> 
+<dd> Default=5.0. Distance threshold between chains in order to specify the interface region. Residues in the interface are defined as those that have atoms within the <i> distance cutoff </i> of atoms in residues in any other chain. </dd> 
+</dl>
+
+
+<B> Protein-Ligand Interface Sampling  </B>
+<dl>
+
+
+<dt> <B> --around-ligand  </B> <i> ligand distance cutoff </i>   </dt> 
+<dd> Default=10.0. Maximum distance between protein and ligand atoms to define the interface region. The protein-ligand interface will be defined by all ligand atoms and those protein atoms within the <i> ligand distance cutoff </i> of any ligand atom.  </dd> 
+
+
+<dt> <B> --ligfile  </B> <i> ligand description filename </i>  </dt> 
+<dd> File containing the ligand description. See example below. </dd> 
+<br>
+A text file (see <a href="../examples/unix/runnable/rappertk-ligdesc.txt">
+rappertk-ligdesc.txt</a>) containing the following information needs to be given : <br> 
+<ol>
+<li>Name of the ligand. <br>
+<b>  ligname </b>  <i> ligand name</i>. <br>
+Three letter ligand name as given in the input PDB file. <br>
+
+<li>Approximate coordinates of  ligand (init lines). <br>
+<b> init </b> <i> distance1 distance2 </i> [<i>atom1</i>] [<i>atom2</i>] <br>
+The position of any two covalently bound ligand atoms <i> atom1 </i> and  <i> atom2  </i> needs to be initialised.  <i> distance1 </i> and  <i> distance2  </i> specifies the maximum deviation in Angstroms in the position of the boostrapped atoms <i> atom1 </i> and  <i> atom2  </i> from their initial positions given in the input PDB file.  <br>
+
+<li>Rotatable bonds (rotbond lines).   <br>
+<b> rotbond </b> <i> minrot maxrot n </i> [<i>atom1</i>] [<i>atom2</i>] [<i>atom3</i>] [<i>atom4</i>] [<i>atom5</i>] ... <br>
+The atom group from atom3 onwards will be rotated about the <i>atom1</i> - <i>atom2</i> bond within the  range specified by the <i> minrot </i> and <i> maxrot </i> values by any multiple of <i> n</i> degrees. <br>
+
+<li>Internal distance restraints (mindist lines). <br> 
+<b>mindist</b> <i>distance</i> [<i>atom1</i>] [<i>atom2</i>] <br>
+<i>distance1</i> specifies the minimum distance in Angstroms between <i>atom1</i> and <i>atom2</i>. <br>
+
+<br>
+Rotatable bonds are rotated within the given range. Covalent bond lengths and angles are not altered. The extent of the region around the ligand that is to be sampled can be controlled using the --around-ligand keyword. Sections of the protein chain within the defined boundary are identified and sampled. Both the protein and the ligand are treated as flexible and the ensemble generated is consistent within the degrees of freedom of the ligand, the electron density map, minimum van der Waals radii and the covalent geometry of the protein. Electron density restraints (if a map or phased MTZ file is specified) are kept optional except for the ligand.  <br>
+
+
+</dl>
+
+
+<h2><a name="output">PRINTER OUTPUT</a></h2>
+
+<p>The level of output can be controlled by keyword --verbose  <i> int </i> 
+with 1 being least verbose and 10 the most verbose. 
+The program will first output the values of all keyword parameters (including
+DEFAULT values not set by the user). A verbosity level of 6 will print
+progress  on model building at each residue extension step. 
+If restraints are set to optional, any disabled
+restraints will be printed.
+</p>
+
+<H2><a name="function">PROGRAM FUNCTION</a></H2>
+<H3>Unix example script found in $CEXAM/unix/runnable/</H3>
+
+
+
+<li> <B> Protein Ligand Sampling  </B>
+
+<p> This application generates an ensemble of conformations for a protein-ligand interface by automatically fitting various conformations of the ligand into the map. For an example of a ligand description file see <a href="../examples/unix/runnable/rappertk-ligdesc.txt"> rappertk-ligdesc.txt</a>) </p>
+
+Shown below as an example is the ligand description file for the ligand MSQ taken from the PDB file 1DI9. <br> 
+
+###################### <br>
+
+ligname MSQ <br>
+init .2 .2 [ C14] [ N12] # Will initialize the atoms C14 N12 within 0.2 A of their positions given in the input PDB  file. <br>
+<p> rotbond -180 175 30 [ N12] [ C14] [ C15] [ C16] [ C17] [ C18] [ C19] [ S21] [ C22] # Will rotate C15 onwards around the C14-N32 bond by any multiple of 30 and within the range of  -180 and 175 degrees. <br>
+rotbond -180 175 30 [ C16] [ S21] [ C22] # Will rotate the atom C22 around the C16-S21 bond by any multiple of 30 and within the range of  -180 and 175 degrees.<br>
+mindist 5 [ C16] [ C32] # Will ensure the distance between atoms C16 and C32 is atleast 5A. </p> <br> 
+
+###################### <br>
+<ol>
+<li> Sampling the protein ligand interface. 
+
+
+Sections of the protein within 10.0A of the ligand will be sampled using electron density restraints to generate an ensemble of 15 conformers. <br>
+
+<p> 
+python $RTKROOT/appscripts-acer/cblauncher.py protlig   --ligfile ~/rtk152-O4/test/msq.ligdesc   --xyzin ~/rtk152-O4/test/1di9.pdb   --xyzout models.pdb   --ca-restraint-radius 1.   --sc-centroid-restraint-radius 5.   --sidechain-vdw-reduction 0.75   --population-size 100   --num-models 1   --verbose 6   --around-ligand 10   --hklin  ~/rtk152-O4/test/1di9_mtz/1DI9.mtz  --dir-xyzout ~/rtk152-O4/test/1di9_protlig 
+
+</p>
+
+
+<li> Without electron density restraints
+
+<p> python $RTKROOT/appscripts-acer/cblauncher.py protlig   --ligfile ~/rtk152-O4/test/msq.ligdesc   --xyzin ~/rtk152-O4/test/1di9.pdb   --xyzout models.pdb   --ca-restraint-radius 1.   --sc-centroid-restraint-radius 5.   --sidechain-vdw-reduction 0.75   --population-size 100   --num-models 1   --verbose 6   --around-ligand 10  --dir-xyzout ~/rtk152-O4/test/1di9_protlig </p>
+
+</ol>
+
+<li> <B> Protein - Protein Interface  Sampling  </B> 
+
+<p> Sampling of protein-protein interfaces can be done with or without electron density. The keyword --close-cutoff (float value) defines the maximum distance between residues in different chains that are considered to be in the interface. The chaid IDs of protein chains that need to be sampled are specified using the keyword --chainid chid1,chid2,chid3....chidN. Threshold for the positional restraints  on the C-alpha atom and sidechain-centroids  need to be set. </p>
+<ol>
+<li> With electron density restraints 
+
+<p> python $RTKROOT/appscripts-acer/cblauncher.py protint     --xyzin ~/rtk152-O4/test/1W98.pdb   --xyzout models.pdb   --ca-restraint-radius 1.   --sc-centroid-restraint-radius 5.   --sidechain-vdw-reduction 0.75   --population-size 100   --num-models 1   --verbose 6      --hklin  ~/rtk152-O4/test/1w98_mtz/1W98.mtz  --dir-xyzout ~/rtk152-O4/test/1w98_protint </p>
+
+
+</ol>
+
+
+
+
+<li> <B> All atom / Main chain-only/ Sidechain-only Model Building </B>
+
+<ol>
+<li> All atom modelling without electron density.
+When no phased MTZ or MAP file is given, the models will be generated using only the specified positional restraints. All heavy atoms are built by default. (see <a href="../examples/unix/runnable/rappertk-xray5.exam"> rappertk-xray5.exam</a>). 
+<p> rappertk protmodel --xyzin /home/anjum/test/7ODC.pdb --dir-xyzout /home/anjum/test/protmodel1 --xyzout models.pdb --use-ca-restraints True --ca-restraint-radius 1.0 --use-sc-restraints True --sc-centroid-restraint-radius 2.0 --sidechain-vdw-reduction 0.75 --num-models 1 --backtrack 4X5 --verbose 6 --rotamerlib PRL  --cacaCutoff 5.0 --default-mainchain-b-factor 20.0 --default-sidechain-b-factor 30.0 </p>
+<p> Will generate an all atom model with positional restraints of 1.0A on the C-alpha atom and 2.0A on the centroid of the sidechain atom.</p> 
+<br>
+
+<li> Modelling all heavy atoms with density restraints using a phased MTZ file. See <a href="../examples/unix/runnable/rappertk-xray2.exam"> rappertk-xray2.exam</a>. </p>
+<p> When a MAP/MTZ file is given, model building consists of 2 steps. In the first stage the model is built using the C-alpha atom and sidechain centroid restraints specified by the user. In the second step a side chain optimization strategy (OPSAX, see Reference 2) is used to select the rotamer that has the best fit to density. It has been shown to improve the accuracy of the models but is only applicable to structures (<400 aa). For larger structures it is automatically turned off. OPSAX can also be turned off by setting the keyword --opsax to False. </p>
+<p> rappertk protmodel --xyzin /home/anjum/exh/1BYW.pdb --dir-xyzout /home/anjum/test/protmodel1 --xyzout models.pdb  --hklin /home/anjum/exh/1BYW_mtz/1BYW.mtz --use-ca-restraints True --ca-restraint-radius 1.0 --use-sc-restraints True --sc-centroid-restraint-radius 2.0 --models-get-native-bfactors True  --FP FP --SIGFP SIGFP --FC FC --PHI PHIC --use-FREER True --FREER FreeR_flag --opsax True --use-given-rotamer True </p>
+<br>
+<li> Modelling all heavy atoms with density restraints using a MAP file.
+<p> rappertk protmodel --xyzin /home/anjum/test/7ODC.pdb --dir-xyzout /home/anjum/test/protmodel1 --xyzout models.pdb --use-ca-restraints True --ca-restraint-radius 1.0 --use-sc-restraints True --sc-centroid-restraint-radius 2.0 --models-get-native-bfactors True  --mapin /home/anjum/test/7ODC.map --opsax True --use-given-rotamer True           </p>
+<br>
+<li> Modelling mainchain only atoms with density restraints using a phased MTZ file..
+<p> If only mainchain atoms need to be built the keyword --mconly needs to be set to True. (see <a href="../examples/unix/runnable/rappertk-xray3.exam"> rappertk-xray3.exam</a>). </p>
+
+<p> rappertk protmodel --xyzin /home/anjum/test/7ODC.pdb --dir-xyzout /home/anjum/test/protmodel1 --xyzout models.pdb --mapin /home/anjum/test/7ODC.map <b> --mconly True </b> --use-ca-restraints True --ca-restraint-radius 1.0 --default-mainchain-b-factor 20.0  </p>
+
+<br>
+<li> Modelling only sidechain atoms with density restraints using a phased MTZ file.
+<p> If only sidechains need to be optimised keeping the mainchain fixed, set --sconly to True. (Can only be used in conjunction with a phased mtz or map file , see <a href="../examples/unix/runnable/rappertk-xray4.exam"> rappertk-xray4.exam</a>). </p>
+
+<p> rappertk protmodel --xyzin /home/anjum/test/7ODC.pdb --mapin /home/anjum/test/7ODC.map --dir-xyzout /home/anjum/test/protmodel1 --xyzout models.pdb <b> --sconly True </b> --sidechain-vdw-reduction 0.75 --rotamerlib PRL  --opsax True --use-given-rotamer True --default-sidechain-b-factor 30.0          </p>
+<br>
+
+<li> Building sidechain atoms for a complete mainchain within a given density map.
+<p> rappertk protmodel --dir-xyzout /home/anjum/test/protmodel1 --xyzout models.pdb --xyzin /home/anjum/test/7ODC.pdb --hklin /home/anjum/test/7ODC.phased.mtz <b> --use-ca-restraints True --ca-restraint-radius 0.5 --add-sidechains True </b> --sidechain-vdw-reduction 0.75 --num-models 1 --rotamerlib PRL --cacaCutoff 5.0  --FP FP --SIGFP SIGFP --FC FC --PHI PHIC --use-FreeR True --FREER FreeR_flag --opsax True --use-given-rotamer True --default-mainchain-b-factor 20.0 --default-sidechain-b-factor 30.0 </p>
+
+
+</ol>
+
+
+
+<li> <B> Rebuilding regions that have a poor fit to the density </B>
+
+<p>Regions of the input structure that have a poor fit to the map
+(default Correlation Coefficient < 0.9) are identified and flagged for
+rebuilding. The score is evaluated over all atoms, only mainchain
+atoms and only sidechain atoms of each residue. Residues that have a
+poor mainchain or all-atom score are rebuilt otherwise only the
+sidechain is reassigned. (see <a href="../examples/unix/runnable/rappertk-xray1.exam">
+rappertk-xray1.exam</a> )</p>
+
+*** NOTE *** When rebuilding only bad fitting regions an MTZ file needs to be given.
+
+<p> rappertk protmodel --xyzin /home/anjum/exh/1BYW.pdb --dir-xyzout /home/anjum/test/protmodel1 --xyzout models.pdb <b> --hklin /home/anjum/exh/1BYW_mtz/1BYW.mtz --rebuild-poor-regions-only True --poor-fit-threshold 0.9  </b> --FP FP --SIGFP SIGFP --use-FREER True --FREER FreeR_flag --use-ca-restraints True --ca-restraint-radius 1.0 --use-sc-restraints True --sc-centroid-restraint-radius 2.0 --models-get-native-bfactors True --opsax True --use-given-rotamer True          </p>
+
+
+
+<li> <B> Loop modelling </B> : Optimising residues in loops / specific section/s of chain. <br> 
+
+<p> Specific sections of the protein chain can be built/optimised by specifying the chain ID and residue range. For loops/sections < 5 residues in length , residues are built from the N-anchor residue to the C-anchor residue (standard loop building). For larger sections/loops, either the protein chain is extended from both the anchor points and closed in the centre or the standard loop building is used. The following examples illustrate different modelling scenarios. 
+</p>
+
+<ol> 
+<li> Without electron density and with positional restraints on C-alpha atoms. The input PDB file has to contain C-alpha atom coordinates for the section/s to be optimised.
+
+<p> rappertk protmodel --xyzin /home/anjum/exh/1BYW.pdb --dir-xyzout /home/anjum/test/protmodel1 --xyzout models.pdb --use-ca-restraints True --ca-restraint-radius 1.0 --use-sc-restraints False --models-get-native-bfactors True <b> --start 220 --stop 227 --chainid A </b> </p>
+
+<li> Without electron density restraints and with positional restraints on the C-alpha atom and centroid of sidechain atoms. 
+
+<p> rappertk protmodel --xyzin /home/anjum/exh/1BYW.pdb --dir-xyzout /home/anjum/test/protmodel1 --xyzout models.pdb  --hklin /home/anjum/exh/1BYW_mtz/1BYW.mtz --use-ca-restraints True --ca-restraint-radius 1.0 --use-sc-restraints True --sc-centroid-restraint-radius 2.0 --models-get-native-bfactors True  --FP FP --SIGFP SIGFP --FC FC --PHI PHIC --use-FREER True --FREER FreeR_flag --opsax True --use-given-rotamer True <b> --start 220 --stop 227 --chainid A </b> </p>
+
+</ul>
+
+<li> Building residues in loops / specific section of chain <br> 
+If C-alpha coordinates for the section to be built are not to be used then set --use-ca-restraints False. In this case only the sequence will be taken from the file and the loop will be generated without the use of positional restraints. Alternatively the sequence of the loop region can be specified using --loopseq . The length of the sequence needs to match the residue range specified by the --start and --stop residue numbers. Sequence needs to be single letter code in uppercase.
+
+
+<p> rappertk protmodel --xyzin /home/anjum/exh/1BYW.pdb --dir-xyzout /home/anjum/test/protmodel1 --xyzout models.pdb  --hklin /home/anjum/exh/1BYW_mtz/1BYW.mtz <b> --use-ca-restraints False --start 220 --stop 227 --chainid A </b>  --FP FP --SIGFP SIGFP --FC FC --PHI PHIC --use-FREER True --FREER FreeR_flag --opsax True --use-given-rotamer True </p>
+
+</ol>
+
+
+
+<H2><a name="examples">EXAMPLES</a></H2>
+
+<H3>Unix example script found in $CEXAM/unix/runnable/</H3>
+<ul>
+</ul>
+
+<H2> TIPS FOR TROUBLESHOOTING </H2>
+
+If model building fails to find a successful solution:
+<ol>
+<li> Try increasing the number of attempts to generate a model using the keyword --attempts .
+<li>When building loops, try different achor residues by changing --start loopstart-1 and/or --stop loopstop+1 the anchor residues on either end.
+<li>If building in regions of weak density try making density restraints optional by setting --make-ed-optional True or all restraints optional by setting --make-all-restraints-optional True.
+
+<li>The model generated needs to be refined (for example with REFMAC).
+<li>Population size can be increased (e.q. 200,300,500) at a computational cost if model building fails. 
+<li>Try modifying the value of restraint thresholds using --ca-restraint-radius and --sc-centroid-restraint-radius.
+<br></ol>
+<H2> REFERENCES</H2>
+<ol>
+<!-- KEEP startreferencelist -->
+<li> <P> Swanand Gore, A. Karmali and T. Blundell, "RapperTK : a versatile engine for
+discrete restraint based sampling of macromolecules", <i>BMC Structural Biology</i>, <b>7:13</b> (2007)</P>
+		
+<LI><P>Gore,S.P., and T.L. Blundell, "OPSAX Optimal
+side-chain packing in proteins and crystallographic
+refinement", <I> J App Cryst </I> <B> 41 </B> 319-328 (2008) </P>
+
+<LI><P>S.C. Lovell, I.W.Davis, W.B. Arendall III, P.I.W. de Bakker, J.M. Word, M.G. Prisant,
+J.S. Richardson, D.C. Richardson, "Structure validation by
+Calpha geometry: phi,psi and Cbeta deviation." <I>Proteins: Struct.
+Funct. Genet.</I> <B>50</B> 437-450 (2003) </P>
+
+
+<LI><P>R.P. Shetty, P.I.W.de Bakker, M.A. DePristo, T.L. Blundell, "The advantages of
+fine-grained side chain conformer libraries." <I>Protein Engineering </I>
+<B>16</B> 963-969 (2003) </P>
+
+
+<LI><P> S.C. Lovell, J.M. Word, J.S. Richardson, D.C. Richardson, "The penultimate rotamer library." <I> Protein s </I>
+<B>15; 40(3)</B> 389-408 (2000) </P>
+
+
+
+
+<!-- KEEP endreferencelist -->
+</ol>
+
+<H2> AUTHORS</H2>
+<P> Swanand Gore, Anjum Karmali and Tom Blundell.</P>
+
+<H2> SEE ALSO</H2>
+
+<p>
+Information on additional C-alpha tracing modes and utility scripts for
+evaluating RMSD, superposition etc using Rappertk can be found on
+<a href http://www-cryst.bioc.cam.ac.uk/~anjum/></a>
+</p>
+<ul>
+<li><p><a href="rapper.html">RAPPER</a></p>
+<li><p><a href="rampage.html">RAMPAGE</a></p>
+</ul>
+</BODY>
+</HTML>

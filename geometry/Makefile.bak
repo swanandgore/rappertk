@@ -1,0 +1,31 @@
+DEPTH = ../
+SUBDIRS =
+
+LINCFLAGS += $(RTKROOT)/misc/_misc.so
+
+CSOURCES = Grid functions CAtraceGH jacobi 
+ISOURCES = geometry
+SWIGLIB = geometry
+
+ifdef CLIPPERGEOM
+LINCFLAGS += -L$(CLIPPERGEOM)/ccp4-onlylibs-dev/lib \
+                -L$(CLIPPERGEOM)/lib/ \
+                -L$(CLIPPERGEOM)/clipper/minimol/ \
+                -L$(CLIPPERGEOM)/clipper/mmdb/ -lclipper-mmdb \
+                -L$(CLIPPERGEOM)/clipper/mmdbold/ -lclipper-mmdbold \
+                -L$(CLIPPERGEOM)/clipper/phs/ -lclipper-phs \
+                -L$(CLIPPERGEOM)/clipper/cif/ -lclipper-cif \
+                -L$(CLIPPERGEOM)/clipper/contrib/ -lclipper-contrib \
+                -L$(CLIPPERGEOM)/clipper/core/ \
+                -lclipper-ccp4 -lccp4c -lclipper-minimol -lclipper-mmdb -lclipper-mmdbold -lclipper-phs -lclipper-cif -lclipper-contrib -lclipper-core -lrfftw -lfftw -lmmdb -lm
+INCFLAGS += -I$(CLIPPERGEOM)/ccp4-onlylibs-dev/include -I$(CLIPPERGEOM)/mmdb/mmdb -I$(CLIPPERGEOM)/cctbx -I$(CLIPPERGEOM)/include
+CFLAGS += -DCLIPPERGEOM
+endif
+-include $(DEPTH)/makedefs
+# DO NOT DELETE
+
+CAtraceGH.o: /usr/local/xtal/rtk152-O4/misc/verbosity.h CAtraceGH.h
+CAtraceGH.o: GridHelper.h
+functions.o: functions.h /usr/local/xtal/rtk152-O4/misc/RanGen.h
+Grid.o: Grid.h GridHelper.h /usr/local/xtal/rtk152-O4/misc/verbosity.h
+test.o: functions.h

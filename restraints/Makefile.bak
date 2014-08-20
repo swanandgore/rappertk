@@ -1,0 +1,49 @@
+DEPTH = ../
+SUBDIRS =
+
+LINCFLAGS = $(RTKROOT)/misc/_misc.so $(RTKROOT)/samplers/_samplers.so
+CSOURCES = Restraint DihedRestraint AngleRestraint DistanceRestraint SphPosRestr CentroidPosRestraint RATrestraint EDrestraint EnvelopeRestraint
+
+#CLIPPER = /home/swanand/downloads/CLIPPER/clipper
+
+# for using electron-density restraints, clipper is essential. set CLIPPER env-var appropriately
+ifdef CLIPPER
+LINCFLAGS += -L$(CLIPPER)/ccp4-onlylibs-dev/lib \
+                -L$(CLIPPER)/lib/ \
+                -L$(CLIPPER)/clipper/minimol/ \
+                -L$(CLIPPER)/clipper/mmdb/ -lclipper-mmdb \
+                -L$(CLIPPER)/clipper/mmdbold/ -lclipper-mmdbold \
+                -L$(CLIPPER)/clipper/phs/ -lclipper-phs \
+                -L$(CLIPPER)/clipper/cif/ -lclipper-cif \
+                -L$(CLIPPER)/clipper/contrib/ -lclipper-contrib \
+                -L$(CLIPPER)/clipper/core/ \
+                -lclipper-ccp4 -lccp4c -lclipper-minimol -lclipper-mmdb -lclipper-mmdbold -lclipper-phs -lclipper-cif -lclipper-contrib -lclipper-core -lrfftw -lfftw -lmmdb -lm
+INCFLAGS += -I$(CLIPPER)/ccp4-onlylibs-dev/include -I$(CLIPPER)/mmdb/mmdb -I$(CLIPPER)/cctbx -I$(CLIPPER)/include
+CFLAGS += -DCLIPPER
+endif
+
+ISOURCES = restraints
+SWIGLIB = restraints
+
+-include $(DEPTH)/makedefs
+# DO NOT DELETE
+
+AngleRestraint.o: AngleRestraint.h Restraint.h
+AngleRestraint.o: /usr/local/xtal/rtk152-O4/misc/verbosity.h
+AngleRestraint.o: /usr/local/xtal/rtk152-O4/geometry/functions.h
+CentroidPosRestraint.o: /usr/local/xtal/rtk152-O4/misc/verbosity.h
+CentroidPosRestraint.o: CentroidPosRestraint.h Restraint.h
+DihedRestraint.o: DihedRestraint.h Restraint.h
+DihedRestraint.o: /usr/local/xtal/rtk152-O4/misc/verbosity.h
+DihedRestraint.o: /usr/local/xtal/rtk152-O4/geometry/functions.h
+DistanceRestraint.o: DistanceRestraint.h Restraint.h
+DistanceRestraint.o: /usr/local/xtal/rtk152-O4/misc/verbosity.h
+EDrestraint.bu.o: EDrestraint.h Restraint.h
+EDrestraint.o: EDrestraint.h Restraint.h
+EnvelopeRestraint.o: EnvelopeRestraint.h Restraint.h
+EnvelopeRestraint.o: /usr/local/xtal/rtk152-O4/geometry/Grid.h
+RATrestraint.o: RATrestraint.h Restraint.h ../samplers/RATdata.h
+RATrestraint.o: ../geometry/functions.h ../misc/RanGen.h
+Restraint.o: Restraint.h
+SphPosRestr.o: SphPosRestr.h Restraint.h
+SphPosRestr.o: /usr/local/xtal/rtk152-O4/misc/verbosity.h

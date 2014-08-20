@@ -1,0 +1,1363 @@
+{+ file: generate.inp +}
+{+ directory: general +}
+{+ description: Generate structure file for protein, dna/rna, water,
+                ligands and/or carbohydrate +}
+{+ comment:
+           If required generate hydrogens. Any atoms with unknown
+           coordinates can be automatically generated +}
+{+ authors: Paul Adams and Axel Brunger +}
+{+ copyright: Yale University +}
+
+{- Guidelines for using this file:
+   - all strings must be quoted by double-quotes
+   - logical variables (true/false) are not quoted
+   - do not remove any evaluate statements from the file -}
+
+{- Special patches will have to be entered manually at the relevant points
+   in the file - see comments throughout the file -}
+
+{- begin block parameter definition -} define(
+
+{============================== important =================================}
+
+{* Coordinates for molecules of the same type (eg. all protein, all 
+   nucleic acid etc) can be input in the same coordinate file if the
+   different chains are separated by a TER card or each chain has
+   a different segid or chainid. *}
+
+{* A break in a chain can be detected automatically or should be delimited
+   by a BREAK card. In this case no patch (head, tail or link) will be
+   applied between the residues that bound the chain break. *}
+
+{* If a segid is present in the coordinate file it will be read unless
+   segid renaming is used below. If renaming is used then all chains in a 
+   coordinate file will be given the same segid. *}
+
+{* If a PDB chain identifier is present in the coordinate file then this 
+   can be used for the segid *}
+
+{* NB. All input PDB files must finish with an END statement *}
+
+{============================ protein files ================================}
+
+{* Multiple coordinate files of the same type can be defined by duplicating
+   all of the entries below and incrementing the file number *}
+
+{* protein coordinate file *}
+{===>} prot_coordinate_infile_1="amy.pdb";
+
+{* rename segid *}
+{+ choice: true false +}
+{===>} prot_rename_1=false;
+
+{* new segid *}
+{===>} prot_segid_1="";
+
+{* convert chainid to segid if chainid is non-blank *}
+{+ choice: true false +}
+{===>} prot_convert_1=false;
+
+{* separate chains by segid - a new segid starts a new chain *}
+{+ choice: true false +}
+{===>} prot_separate_1=true;
+
+{========================= nucleic acid files ==============================}
+
+{* Multiple coordinate files of the same type can be defined by duplicating
+   all of the entries below and incrementing the file number *}
+
+{* nucleic acid coordinate file *}
+{===>} nucl_coordinate_infile_1="";
+
+{* rename segid *}
+{+ choice: true false +}
+{===>} nucl_rename_1=false;
+
+{* new segid *}
+{===>} nucl_segid_1="";
+
+{* convert chainid to segid if chainid is non-blank *}
+{+ choice: true false +}
+{===>} nucl_convert_1=false;
+
+{* separate chains by segid - a new segid starts a new chain *}
+{+ choice: true false +}
+{===>} nucl_separate_1=true;
+
+{============================= water files =================================}
+
+{* Multiple coordinate files of the same type can be defined by duplicating
+   all of the entries below and incrementing the file number *}
+
+{* water coordinate file *}
+{===>} water_coordinate_infile_1="";
+
+{* rename segid *}
+{+ choice: true false +}
+{===>} water_rename_1=false;
+
+{* new segid *}
+{===>} water_segid_1="";
+
+{* convert chainid to segid if chainid is non-blank *}
+{+ choice: true false +}
+{===>} water_convert_1=false;
+
+{========================= carbohydrate files ==============================}
+
+{* Multiple coordinate files of the same type can be defined by duplicating
+   all of the entries below and incrementing the file number *}
+
+{* carbohydrate coordinate file *}
+{===>} carbo_coordinate_infile_1="";
+
+{* rename segid *}
+{+ choice: true false +}
+{===>} carbo_rename_1=false;
+
+{* new segid *}
+{===>} carbo_segid_1="";
+
+{* convert chainid to segid if chainid is non-blank *}
+{+ choice: true false +}
+{===>} carbo_convert_1=false;
+
+{======================== prosthetic group files ===========================}
+
+{* Multiple coordinate files of the same type can be defined by duplicating
+   all of the entries below and incrementing the file number *}
+
+{* prosthetic group coordinate file *}
+{===>} prost_coordinate_infile_1="";
+
+{* rename segid *}
+{+ choice: true false +}
+{===>} prost_rename_1=false;
+
+{* new segid *}
+{===>} prost_segid_1="";
+
+{* convert chainid to segid if chainid is non-blank *}
+{+ choice: true false +}
+{===>} prost_convert_1=false;
+
+{============================ ligand files =================================}
+
+{* Multiple coordinate files of the same type can be defined by duplicating
+   all of the entries below and incrementing the file number *}
+
+{* ligand coordinate file *}
+{===>} lig_coordinate_infile_1="";
+
+{* rename segid *}
+{+ choice: true false +}
+{===>} lig_rename_1=false;
+
+{* new segid *}
+{===>} lig_segid_1="";
+
+{* convert chainid to segid if chainid is non-blank *}
+{+ choice: true false +}
+{===>} lig_convert_1=false;
+
+{============================== ions files =================================}
+
+{* Multiple coordinate files of the same type can be defined by duplicating
+   all of the entries below and incrementing the file number *}
+
+{* ion coordinate file *}
+{===>} ion_coordinate_infile_1="";
+
+{* rename segid *}
+{+ choice: true false +}
+{===>} ion_rename_1=false;
+
+{* new segid *}
+{===>} ion_segid_1="";
+
+{* convert chainid to segid if chainid is non-blank *}
+{+ choice: true false +}
+{===>} ion_convert_1=false;
+
+{============================ renaming atoms ===============================}
+
+{* some atoms may need to be renamed in the topology database to conform
+   to what is present in the coordinate file *}
+
+{* delta carbon in isoleucine is named CD in CNS
+   what is it currently called in the coordinate file? *}
+{* this will not be changed if left blank *}
+{===>} ile_CD_becomes="CD1";
+
+{* terminal oxygens are named OT1 and OT2 in CNS
+   what are they currently called in the coordinate file? *}
+{* these will not be changed if left blank *}
+{===>} OT1_becomes="O";
+{===>} OT2_becomes="OXT";
+
+{======================= automatic mainchain breaks ========================}
+
+{* automatically detect mainchain breaks in proteins based on distance *}
+{* the peptide link at break points will be removed *}
+{+ choice: true false +}
+{===>} auto_break=true;
+
+{* cutoff distance in Angstroms for identification of breaks *}
+{* the default of 2.5A should be reasonable for most cases. If the input
+   structure has bad geometry it may be necessary to increase this distance *}
+{===>} break_cutoff=2.5;
+
+{* file containing patches to delete peptide links *}
+{===>} prot_break_infile="CNS_TOPPAR:protein_break.top";
+
+{======================= automatic disulphide bonds ========================}
+
+{* automatically detect disulphide bonds based on distance *}
+{+ choice: true false +}
+{===>} auto_ss=true;
+
+{* cutoff distance in Angstroms for identification of disulphides *}
+{* the default of 3.0A should be reasonable for most cases. If the input
+   structure has bad geometry it may be necessary to increase this distance *}
+{===>} disulphide_dist=3.0;
+
+{========================= manual disulphide bonds =========================}
+
+{* Select pairs of cysteine residues that form disulphide bonds *}
+{* First 2 entries are the segid and resid of the first cysteine (CYS A). *}
+{* Second 2 entries are the segid and resid of the second cysteine (CYS B). *}
+{+ table: rows=8 numbered 
+   cols=5 "use" "segid CYS A" "resid CYS A" "segid CYS B" "resid CYS B" +}
+
+{+ choice: true false +}
+{===>} ss_use_1=false;
+{===>} ss_i_segid_1=""; ss_i_resid_1=0;
+{===>} ss_j_segid_1=""; ss_j_resid_1=0;
+
+{+ choice: true false +}
+{===>} ss_use_2=false;
+{===>} ss_i_segid_2=""; ss_i_resid_2=0;
+{===>} ss_j_segid_2=""; ss_j_resid_2=0;
+
+{+ choice: true false +}
+{===>} ss_use_3=false;
+{===>} ss_i_segid_3=""; ss_i_resid_3=0;
+{===>} ss_j_segid_3=""; ss_j_resid_3=0;
+
+{+ choice: true false +}
+{===>} ss_use_4=false;
+{===>} ss_i_segid_4=""; ss_i_resid_4=0;
+{===>} ss_j_segid_4=""; ss_j_resid_4=0;
+
+{+ choice: true false +}
+{===>} ss_use_5=false;
+{===>} ss_i_segid_5=""; ss_i_resid_5=0;
+{===>} ss_j_segid_5=""; ss_j_resid_5=0;
+
+{+ choice: true false +}
+{===>} ss_use_6=false;
+{===>} ss_i_segid_6=""; ss_i_resid_6=0;
+{===>} ss_j_segid_6=""; ss_j_resid_6=0;
+
+{+ choice: true false +}
+{===>} ss_use_7=false;
+{===>} ss_i_segid_7=""; ss_i_resid_7=0;
+{===>} ss_j_segid_7=""; ss_j_resid_7=0;
+
+{+ choice: true false +}
+{===>} ss_use_8=false;
+{===>} ss_i_segid_8=""; ss_i_resid_8=0;
+{===>} ss_j_segid_8=""; ss_j_resid_8=0;
+
+{========================= RNA to DNA conversion  ==========================}
+
+{* All nucleic acid residues initially have ribose sugars (rather than 
+   deoxyribose). A patch must be applied to convert the ribose to deoxyribose
+   for DNA residues. Select those residues which need to have the patch 
+   applied to make them DNA. *}
+{* Make sure that the atom selection is specific for the nucleic acid
+   residues *}
+{===>} dna_sele=(none);
+
+{=========================== carbohydrate links  ===========================}
+
+{* Select pairs of residues that are linked *}
+{* First entry is the name of the patch residue. *}
+{* Second and third entries are the resid and segid for the atoms
+   referenced by "-" in the patch. *}
+{* Fourth and fifth entries are the resid and segid for the atoms 
+   referenced by "+" in the patch *}
+{+ table: rows=6 numbered 
+          cols=6 "use" "patch name" "segid -" "resid -" "segid +" "resid +" +}
+
+{+ choice: true false +}
+{===>} carbo_use_1=false;
+{===>} carbo_patch_1="B1N";
+{===>} carbo_i_segid_1="BBBB"; carbo_i_resid_1=401;
+{===>} carbo_j_segid_1="AAAA"; carbo_j_resid_1=56;
+
+{+ choice: true false +}
+{===>} carbo_use_2=false; 
+{===>} carbo_patch_2="B1N";
+{===>} carbo_i_segid_2="BBBB"; carbo_i_resid_2=402;
+{===>} carbo_j_segid_2="AAAA"; carbo_j_resid_2=182;
+
+{+ choice: true false +}
+{===>} carbo_use_3=false; 
+{===>} carbo_patch_3="";
+{===>} carbo_i_segid_3=""; carbo_i_resid_3=0;
+{===>} carbo_j_segid_3=""; carbo_j_resid_3=0;
+
+{+ choice: true false +}
+{===>} carbo_use_4=false; 
+{===>} carbo_patch_4="";
+{===>} carbo_i_segid_4=""; carbo_i_resid_4=0;
+{===>} carbo_j_segid_4=""; carbo_j_resid_4=0;
+
+{+ choice: true false +}
+{===>} carbo_use_5=false; 
+{===>} carbo_patch_5="";
+{===>} carbo_i_segid_5=""; carbo_i_resid_5=0;
+{===>} carbo_j_segid_5=""; carbo_j_resid_5=0;
+
+{+ choice: true false +}
+{===>} carbo_use_6=false; 
+{===>} carbo_patch_6="";
+{===>} carbo_i_segid_6=""; carbo_i_resid_6=0;
+{===>} carbo_j_segid_6=""; carbo_j_resid_6=0;
+
+{========================= generate parameters =============================}
+
+{* hydrogen flag - determines whether hydrogens will be output *}
+{* must be true for NMR, atomic resolution X-ray crystallography 
+   or modelling.  Set to false for most X-ray crystallographic 
+   applications at resolution > 1A *}
+{+ choice: true false +}
+{===>} hydrogen_flag=false;
+
+{* which hydrogens to build *}
+{+ choice: "all" "unknown" +}
+{===>} hydrogen_build="all";
+
+{* selection of atoms other than hydrogens for which coordinates
+   will be generated *}
+{* to generate coordinates for all unknown atoms use: (not(known)) *}
+{===>} atom_build=(not(known));
+
+{* selection of atoms to be deleted *}
+{* to delete no atoms use: (none) *}
+{===>} atom_delete=(none);
+
+{* set bfactor flag *}
+{+ choice: true false +}
+{===>} set_bfactor=false;
+
+{* set bfactor value *}
+{===>} bfactor=15.0;
+
+{* set occupancy flag *}
+{+ choice: true false +}
+{===>} set_occupancy=false;
+
+{* set occupancy value *}
+{===>} occupancy=1.0;
+
+{============================= output files ================================}
+
+{* output structure file *}
+{===>} structure_outfile="generate.mtf";
+
+{* output coordinate file *}
+{===>} coordinate_outfile="generate.pdb";
+
+{* format output coordinates for use in o *}
+{* if false then the default CNS output coordinate format will be used *}
+{+ choice: true false +}
+{===>} pdb_o_format=true;
+
+{================== protein topology and parameter files ===================}
+
+{* protein topology file *}
+{===>} prot_topology_infile="CNS_TOPPAR:protein.top";
+
+{* protein linkage file *}
+{===>} prot_link_infile="CNS_TOPPAR:protein.link";
+
+{* protein parameter file *}
+{===>} prot_parameter_infile="CNS_TOPPAR:protein_rep.param";
+
+{================ nucleic acid topology and parameter files =================}
+
+{* nucleic acid topology file *}
+{===>} nucl_topology_infile="CNS_TOPPAR:dna-rna.top";
+
+{* nucleic acid linkage file *}
+{* use CNS_TOPPAR:dna-rna-pho.link for 5'-phosphate *}
+{===>} nucl_link_infile="CNS_TOPPAR:dna-rna.link";
+
+{* nucleic acid parameter file *}
+{===>} nucl_parameter_infile="CNS_TOPPAR:dna-rna_rep.param";
+
+{=================== water topology and parameter files ====================}
+
+{* water topology file *}
+{===>} water_topology_infile="CNS_TOPPAR:water.top";
+
+{* water parameter file *}
+{===>} water_parameter_infile="CNS_TOPPAR:water_rep.param";
+
+{================= carbohydrate topology and parameter files ===============}
+
+{* carbohydrate topology file *}
+{===>} carbo_topology_infile="CNS_TOPPAR:carbohydrate.top";
+
+{* carbohydrate parameter file *}
+{===>} carbo_parameter_infile="CNS_TOPPAR:carbohydrate.param";
+
+{============= prosthetic group topology and parameter files ===============}
+
+{* prosthetic group topology file *}
+{===>} prost_topology_infile="";
+
+{* prosthetic group parameter file *}
+{===>} prost_parameter_infile="";
+
+{=================== ligand topology and parameter files ===================}
+
+{* ligand topology file *}
+{===>} lig_topology_infile="";
+
+{* ligand parameter file *}
+{===>} lig_parameter_infile="";
+
+{===================== ion topology and parameter files ====================}
+
+{* ion topology file *}
+{===>} ion_topology_infile="CNS_TOPPAR:ion.top";
+
+{* ion parameter file *}
+{===>} ion_parameter_infile="CNS_TOPPAR:ion.param";
+
+{===========================================================================}
+{         things below this line do not need to be changed unless           }
+{         you need to apply patches - at the appropriate places marked      }
+{===========================================================================}
+
+ ) {- end block parameter definition -}
+
+ checkversion 1.1
+
+ evaluate ($log_level=quiet)
+
+ topology
+   if ( &BLANK%prot_topology_infile = false ) then
+     @@&prot_topology_infile
+   end if
+   if ( &BLANK%nucl_topology_infile = false ) then
+     @@&nucl_topology_infile
+   end if
+   if ( &BLANK%water_topology_infile = false ) then
+     @@&water_topology_infile
+   end if
+   if ( &BLANK%carbo_topology_infile = false ) then
+     @@&carbo_topology_infile
+   end if
+   if ( &BLANK%prost_topology_infile = false ) then
+     @@&prost_topology_infile
+   end if
+   if ( &BLANK%lig_topology_infile = false ) then
+     @@&lig_topology_infile
+   end if
+   if ( &BLANK%ion_topology_infile = false ) then
+     @@&ion_topology_infile
+   end if
+ end
+
+ topology
+   if ( &BLANK%prot_break_infile = false ) then
+     @@&prot_break_infile
+   end if
+ end
+
+ parameter
+   if ( &BLANK%prot_parameter_infile = false ) then
+     @@&prot_parameter_infile
+   end if
+   if ( &BLANK%nucl_parameter_infile = false ) then
+     @@&nucl_parameter_infile
+   end if
+   if ( &BLANK%water_parameter_infile = false ) then
+     @@&water_parameter_infile
+   end if
+   if ( &BLANK%carbo_parameter_infile = false ) then
+     @@&carbo_parameter_infile
+   end if
+   if ( &BLANK%prost_parameter_infile = false ) then
+     @@&prost_parameter_infile
+   end if
+   if ( &BLANK%lig_parameter_infile = false ) then
+     @@&lig_parameter_infile
+   end if
+   if ( &BLANK%ion_parameter_infile = false ) then
+     @@&ion_parameter_infile
+   end if
+ end
+
+ do (refy=0) (all)
+ evaluate ($counter=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop prot
+   if ( &exist_prot_coordinate_infile_$counter = true ) then
+     if ( &BLANK%prot_coordinate_infile_$counter = false ) then
+       do (refx=0) (all)
+       segment
+         chain
+           if ( &prot_convert_$counter = true ) then
+             convert=true
+           end if
+           if ( &prot_separate_$counter = true ) then
+             separate=true
+           end if
+           @@&prot_link_infile
+           coordinates @@&prot_coordinate_infile_$counter
+         end
+       end
+       if ( &BLANK%ile_CD_becomes = false ) then
+         do (name=&ile_CD_becomes) (resname ILE and name CD)
+       end if
+       if ( &BLANK%OT1_becomes = false ) then
+         do (name=&OT1_becomes) (name OT1)
+       end if
+       if ( &BLANK%OT2_becomes = false ) then
+         do (name=&OT2_becomes) (name OT2)
+       end if
+       if ( &prot_rename_$counter = true ) then
+         do (refy=$counter) (attr refx=9999)
+       end if
+     end if
+     evaluate ($counter=$counter+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop prot
+
+ {* any special protein patches can be applied here *}
+ {===>}
+ {<===}
+
+ evaluate ($counter=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop prot
+   if ( &exist_prot_coordinate_infile_$counter = true ) then
+     if ( &BLANK%prot_coordinate_infile_$counter = false ) then
+       coor 
+         if ( &prot_convert_$counter = true ) then
+           convert=true
+         end if
+         @@&prot_coordinate_infile_$counter
+         set echo=off end
+         show sum(1) ( not(hydrogen) and not(known) )
+         if ( $select = 0 ) then
+           display  %INFO: There are no coordinates missing for non-hydrogen atoms
+         end if
+         set echo=on end
+       if ( &prot_rename_$counter = true ) then
+         do (segid=capitalize(&prot_segid_$counter)) (attr refy=$counter)
+       end if
+     end if
+     evaluate ($counter=$counter+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop prot
+
+ if ( $log_level = verbose ) then
+   set message=normal echo=on end
+ else
+   set message=off echo=off end
+ end if
+
+ if ( &auto_break = true ) then
+
+   evaluate ($break=0)
+
+   for $id1 in id ( name C and bondedto(name CA) and bondedto(name O) ) loop break
+
+     show (segid) (id $id1)
+     evaluate ($segid1=$result)
+     show (resid) (id $id1)
+     evaluate ($resid1=$result)
+     show (resname) (id $id1)
+     evaluate ($resname1=$result)
+
+     show sum(1) (id $id1 and known)
+     if ( $result = 0 ) then
+       display unknown coordinates for segid $segid1 resname $resname1 resid $resid1 name C
+       display this coordinate must be known for automatic chain break detection
+       abort
+     end if
+ 
+     identity (store1) ( name N and bondedto( segid $segid1 and resid $resid1 and name c ) )
+
+     if ( $select = 1 ) then
+       show element (store1) (attribute store1 > 0)
+       evaluate ($id2=$result)
+       show (segid) (id $id2)
+       evaluate ($segid2=$result)
+       show (resid) (id $id2)
+       evaluate ($resid2=$result)
+       show (resname) (id $id2)
+       evaluate ($resname2=$result)
+
+       show sum(1) (id $id2 and known)
+       if ( $result = 0 ) then
+         display unknown coordinates for segid $segid2 resname $resname2 resid $resid2 name N
+         display this coordinate must be known for automatic chain break detection
+         abort
+       end if
+ 
+       pick bond
+         (name c and segid $segid1 and resid $resid1)
+         (name n and segid $segid2 and resid $resid2)
+         geometry
+
+       if ( $result > &break_cutoff ) then
+         evaluate ($break=$break+1)
+         evaluate ($seg1.$break=$segid1)
+         evaluate ($res1.$break=$resid1)
+         evaluate ($seg2.$break=$segid2)
+         evaluate ($res2.$break=$resid2)
+         if ( $resname2 = PRO ) then
+           evaluate ($patch.$break=DPPP)
+         elseif ( $resname2 = CPR ) then
+           evaluate ($patch.$break=DPPP)
+         else
+           evaluate ($patch.$break=DPEP)
+         end if
+       end if
+     end if
+
+   end loop break
+
+   evaluate ($counter=1)
+
+   while ($counter <= $break) loop delete
+     patch $patch.$counter
+       reference=-=(segid $seg1.$counter and resid $res1.$counter)
+       reference=+=(segid $seg2.$counter and resid $res2.$counter)
+     end   
+     buffer message
+       display peptide link removed (applied $patch.$counter): from \
+$seg1.$counter[a4] $res1.$counter[a4] to $seg2.$counter[a4] $res2.$counter[a4]
+     end
+     evaluate ($counter=$counter+1)
+   end loop delete
+
+ end if
+
+ if ( &auto_ss = true ) then
+
+   evaluate ($disu=0)
+
+   for $id1 in id ( resname CYS and name SG ) loop dis1
+
+     show (segid) (id $id1)
+     evaluate ($segid1=$result)
+     show (resid) (id $id1)
+     evaluate ($resid1=$result)
+
+     identity (store1) (all)
+
+     for $id2 in id ( resname CYS and name SG and
+                    ( attr store1 > $id1 ) ) loop dis2
+
+       show (segid) (id $id2)
+       evaluate ($segid2=$result)
+       show (resid) (id $id2)
+       evaluate ($resid2=$result)
+  
+       pick bond (id $id1) (id $id2) geometry
+
+       if ( $result <= &disulphide_dist ) then
+         evaluate ($disu=$disu+1)
+         evaluate ($seg1.$disu=$segid1)
+         evaluate ($seg2.$disu=$segid2)
+         evaluate ($res1.$disu=$resid1)
+         evaluate ($res2.$disu=$resid2)
+       end if
+
+     end loop dis2
+
+   end loop dis1
+
+   evaluate ($counter=1)
+   while ( $counter <= $disu ) loop disu
+     patch disu
+       reference=1=(segid $seg1.$counter and resid $res1.$counter)
+       reference=2=(segid $seg2.$counter and resid $res2.$counter)
+     end
+     buffer message
+       display disulphide added: from \
+$seg1.$counter[a4] $res1.$counter[a4] to $seg2.$counter[a4] $res2.$counter[a4]
+     end
+     evaluate ($counter=$counter+1)
+   end loop disu
+
+ end if
+
+ evaluate ($ssc=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop ssbr
+   if ( &exist_ss_use_$ssc = true ) then
+     if ( &ss_use_$ssc = true ) then
+       evaluate ($segidtmp1=capitalize(&ss_i_segid_$ssc))
+       evaluate ($segidtmp2=capitalize(&ss_j_segid_$ssc))
+       show sum(1) (        (segid $QUOTE%segidtmp1 and 
+                             resid &ss_i_resid_$ssc and name SG) and
+                    bondedto(segid $QUOTE%segidtmp2 and 
+                             resid &ss_j_resid_$ssc and name SG))
+       if ( $result = 0 ) then
+         patch disu
+           reference=1=(segid $QUOTE%segidtmp1 and resid &ss_i_resid_$ssc)
+           reference=2=(segid $QUOTE%segidtmp2 and resid &ss_j_resid_$ssc)
+         end
+         show sum(1) (        (segid $QUOTE%segidtmp1 and 
+                               resid &ss_i_resid_$ssc and name SG) and
+                      bondedto(segid $QUOTE%segidtmp2 and 
+                               resid &ss_j_resid_$ssc and name SG))
+         if ( $result = 1 ) then
+           buffer message
+             display disulphide added: from $segidtmp1 &ss_i_resid_$ssc \
+to $segidtmp2 &ss_j_resid_$ssc
+           end
+         end if
+       end if
+     end if
+     evaluate ($ssc=$ssc+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop ssbr
+
+ set messages=normal end
+ set echo=on end
+
+ do (refy=0) (all)
+ evaluate ($counter=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop nucl
+   if ( &exist_nucl_coordinate_infile_$counter = true ) then
+     if ( &BLANK%nucl_coordinate_infile_$counter = false ) then
+       do (refx=0) (all)
+       segment
+         chain
+           if ( &nucl_convert_$counter = true ) then
+             convert=true
+           end if
+           if ( &nucl_separate_$counter = true ) then
+             separate=true
+           end if
+           @@&nucl_link_infile
+           coordinates @@&nucl_coordinate_infile_$counter
+         end
+       end
+       if ( &nucl_rename_$counter = true ) then
+         do (refy=$counter) (attr refx=9999)
+       end if
+     end if
+     evaluate ($counter=$counter+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop nucl
+
+ {* any special nucleic acid patches can be applied here *}
+ {===>}
+ {<===}
+
+ evaluate ($counter=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop nucl
+   if ( &exist_nucl_coordinate_infile_$counter = true ) then
+     if ( &BLANK%nucl_coordinate_infile_$counter = false ) then
+       coor 
+         if ( &nucl_convert_$counter = true ) then
+           convert=true
+         end if
+         @@&nucl_coordinate_infile_$counter
+         set echo=off end
+         show sum(1) ( not(hydrogen) and not(known) )
+         if ( $select = 0 ) then
+           display  %INFO: There are no coordinates missing for non-hydrogen atoms
+         end if
+         set echo=on end
+       if ( &nucl_rename_$counter = true ) then
+         do (segid=capitalize(&nucl_segid_$counter)) (attr refy=$counter)
+       end if
+     end if
+     evaluate ($counter=$counter+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop nucl
+
+ {- patching of RNA to DNA -}
+ evaluate ($counter=0)
+ for $id in id ( tag and (&dna_sele) ) loop dna
+   evaluate ($counter=$counter+1)
+   show (segid) (id $id)
+   evaluate ($dna.segid.$counter=$result)
+   show (resid) (id $id)
+   evaluate ($dna.resid.$counter=$result)
+ end loop dna
+ evaluate ($dna.num=$counter)
+
+ evaluate ($counter=0)
+ while ($counter < $dna.num) loop dnap
+   evaluate ($counter=$counter+1)
+   patch deox reference=nil=(segid $dna.segid.$counter and
+                             resid $dna.resid.$counter) end
+ end loop dnap
+
+ do (refy=0) (all)
+ evaluate ($counter=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop water
+   if ( &exist_water_coordinate_infile_$counter = true ) then
+     if ( &BLANK%water_coordinate_infile_$counter = false ) then
+       do (refx=0) (all)
+       segment
+         chain
+           if ( &water_convert_$counter = true ) then
+             convert=true
+           end if
+           coordinates @@&water_coordinate_infile_$counter
+         end
+       end
+       if ( &water_rename_$counter = true ) then
+         do (refy=$counter) (attr refx=9999)
+       end if
+     end if
+     evaluate ($counter=$counter+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop water
+
+ {* any special water patches can be applied here *}
+ {===>}
+ {<===}
+
+ evaluate ($counter=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop water
+   if ( &exist_water_coordinate_infile_$counter = true ) then
+     if ( &BLANK%water_coordinate_infile_$counter = false ) then
+       coor
+         if ( &water_convert_$counter = true ) then
+           convert=true
+         end if
+         @@&water_coordinate_infile_$counter
+         set echo=off end
+         show sum(1) ( not(hydrogen) and not(known) )
+         if ( $select = 0 ) then
+           display  %INFO: There are no coordinates missing for non-hydrogen atoms
+         end if
+         set echo=on end
+       if ( &water_rename_$counter = true ) then
+         do (segid=capitalize(&water_segid_$counter)) (attr refy=$counter)
+       end if
+     end if
+     evaluate ($counter=$counter+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop water
+
+ do (refy=0) (all)
+ evaluate ($counter=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop carbo
+   if ( &exist_carbo_coordinate_infile_$counter = true ) then
+     if ( &BLANK%carbo_coordinate_infile_$counter = false ) then
+       do (refx=0) (all)
+       segment
+         chain
+           if ( &carbo_convert_$counter = true ) then
+             convert=true
+           end if
+           coordinates @@&carbo_coordinate_infile_$counter
+         end
+       end
+       if ( &carbo_rename_$counter = true ) then
+         do (refy=$counter) (attr refx=9999)
+       end if
+     end if
+     evaluate ($counter=$counter+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop carbo
+
+ evaluate ($counter=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop carbo
+   if ( &exist_carbo_coordinate_infile_$counter = true ) then
+     if ( &BLANK%carbo_coordinate_infile_$counter = false ) then
+       coor 
+         if ( &carbo_convert_$counter = true ) then
+           convert=true
+         end if
+         @@&carbo_coordinate_infile_$counter
+         set echo=off end
+         show sum(1) ( not(hydrogen) and not(known) )
+         if ( $select = 0 ) then
+           display  %INFO: There are no coordinates missing for non-hydrogen atoms
+         end if
+         set echo=on end
+       if ( &carbo_rename_$counter = true ) then
+         do (segid=capitalize(&carbo_segid_$counter)) (attr refy=$counter)
+       end if
+     end if
+     evaluate ($counter=$counter+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop carbo
+
+ evaluate ($carc=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop cabr
+   if ( &exist_carbo_use_$carc = true ) then
+     if ( &carbo_use_$carc = true ) then
+       evaluate ($segidtmp1=capitalize(&carbo_i_segid_$carc))
+       evaluate ($segidtmp2=capitalize(&carbo_j_segid_$carc))
+       patch &carbo_patch_$carc
+         reference=-=(segid $QUOTE%segidtmp1 and 
+                      resid &carbo_i_resid_$carc)
+         reference=+=(segid $QUOTE%segidtmp2 and 
+                      resid &carbo_j_resid_$carc)
+       end
+     end if
+     evaluate ($carc=$carc+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop cabr
+
+ {* any special carbohydrate patches can be applied here *}
+ {===>}
+ {<===}
+
+ do (refy=0) (all)
+ evaluate ($counter=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop prost
+   if ( &exist_prost_coordinate_infile_$counter = true ) then
+     if ( &BLANK%prost_coordinate_infile_$counter = false ) then
+       do (refx=0) (all)
+       segment
+         chain
+           if ( &prost_convert_$counter = true ) then
+             convert=true
+           end if
+           coordinates @@&prost_coordinate_infile_$counter
+         end
+       end
+       if ( &prost_rename_$counter = true ) then
+         do (refy=$counter) (attr refx=9999)
+       end if
+     end if
+     evaluate ($counter=$counter+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop prost
+
+ {* any special prosthetic group patches can be applied here *}
+ {===>}
+ {<===}
+
+ evaluate ($counter=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop prost
+   if ( &exist_prost_coordinate_infile_$counter = true ) then
+     if ( &BLANK%prost_coordinate_infile_$counter = false ) then
+       coor
+         if ( &prost_convert_$counter = true ) then
+           convert=true
+         end if
+         @@&prost_coordinate_infile_$counter
+         set echo=off end
+         show sum(1) ( not(hydrogen) and not(known) )
+         if ( $select = 0 ) then
+           display  %INFO: There are no coordinates missing for non-hydrogen atoms
+         end if
+         set echo=on end
+       if ( &prost_rename_$counter = true ) then
+         do (segid=capitalize(&prost_segid_$counter)) (attr refy=$counter)
+       end if
+     end if
+     evaluate ($counter=$counter+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop prost
+
+ do (refy=0) (all)
+ evaluate ($counter=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop liga
+   if ( &exist_lig_coordinate_infile_$counter = true ) then
+     if ( &BLANK%lig_coordinate_infile_$counter = false ) then
+       do (refx=0) (all)
+       segment
+         chain
+           if ( &lig_convert_$counter = true ) then
+             convert=true
+           end if
+           coordinates @@&lig_coordinate_infile_$counter
+         end
+       end
+       if ( &lig_rename_$counter = true ) then
+         do (refy=$counter) (attr refx=9999)
+       end if
+     end if
+     evaluate ($counter=$counter+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop liga
+
+ {* any special ligand patches can be applied here *}
+ {===>}
+ {<===}
+
+ evaluate ($counter=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop liga
+   if ( &exist_lig_coordinate_infile_$counter = true ) then
+     if ( &BLANK%lig_coordinate_infile_$counter = false ) then
+       coor 
+         if ( &lig_convert_$counter = true ) then
+           convert=true
+         end if
+         @@&lig_coordinate_infile_$counter
+         set echo=off end
+         show sum(1) ( not(hydrogen) and not(known) )
+         if ( $select = 0 ) then
+           display  %INFO: There are no coordinates missing for non-hydrogen atoms
+         end if
+         set echo=on end
+       if ( &lig_rename_$counter = true ) then
+         do (segid=capitalize(&lig_segid_$counter)) (attr refy=$counter)
+       end if
+     end if
+     evaluate ($counter=$counter+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop liga
+
+ do (refy=0) (all)
+ evaluate ($counter=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop ion
+   if ( &exist_ion_coordinate_infile_$counter = true ) then
+     if ( &BLANK%ion_coordinate_infile_$counter = false ) then
+       do (refx=0) (all)
+       segment
+         chain
+           if ( &ion_convert_$counter = true ) then
+             convert=true
+           end if
+           coordinates @@&ion_coordinate_infile_$counter
+         end
+       end
+       if ( &ion_rename_$counter = true ) then
+         do (refy=$counter) (attr refx=9999)
+       end if
+     end if
+     evaluate ($counter=$counter+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop ion
+
+ {* any special ion patches can be applied here *}
+ {===>}
+ {<===}
+
+ evaluate ($counter=1)
+ evaluate ($done=false)
+ while ( $done = false ) loop ion
+   if ( &exist_ion_coordinate_infile_$counter = true ) then
+     if ( &BLANK%ion_coordinate_infile_$counter = false ) then
+       coor
+         if ( &ion_convert_$counter = true ) then
+           convert=true
+         end if
+         @@&ion_coordinate_infile_$counter
+         set echo=off end
+         show sum(1) ( not(hydrogen) and not(known) )
+         if ( $select = 0 ) then
+           display  %INFO: There are no coordinates missing for non-hydrogen atoms
+         end if
+         set echo=on end
+       if ( &ion_rename_$counter = true ) then
+         do (segid=capitalize(&ion_segid_$counter)) (attr refy=$counter)
+       end if
+     end if
+     evaluate ($counter=$counter+1)
+   else
+     evaluate ($done=true)
+   end if
+ end loop ion
+
+ {* any final patches can be applied here *}
+ {===>}
+ {<===}
+
+ if (&hydrogen_flag=false) then
+   delete selection=( hydrogen ) end
+ end if
+
+ delete selection=( &atom_delete ) end
+
+ identity (store1) (none)
+
+ identity (store1) (&atom_build)
+ if ( &hydrogen_build = "all" ) then
+   identity (store1) (store1 or hydrogen)
+ elseif ( &hydrogen_build = "unknown" ) then
+   identity (store1) (store1 or (not(known) and hydrogen))
+ end if
+
+ show sum(1) (store1)
+ evaluate ($tobuild=$result)
+
+ if ( $tobuild > 0 ) then
+
+   fix selection=(not(store1)) end
+
+   show sum(1) (store1)
+   evaluate ($moving=$result)
+
+   if ( $moving > 0 ) then
+     for $id in id (tag and byres(store1)) loop avco
+
+       show ave(x) (byres(id $id) and known)
+       evaluate ($ave_x=$result)
+       show ave(y) (byres(id $id) and known)
+       evaluate ($ave_y=$result)
+       show ave(z) (byres(id $id) and known)
+       evaluate ($ave_z=$result)
+
+       do (x=$ave_x) (byres(id $id) and store1)
+       do (y=$ave_y) (byres(id $id) and store1)
+       do (z=$ave_z) (byres(id $id) and store1)
+ 
+     end loop avco 
+
+     do (x=x+random(2.0)) (store1)
+     do (y=y+random(2.0)) (store1)
+     do (z=z+random(2.0)) (store1)
+
+     {- start parameter for the side chain building -}
+     parameter
+       nbonds
+         rcon=20. nbxmod=-2 repel=0.9  wmin=0.1 tolerance=1.
+         rexp=2 irexp=2 inhibit=0.25
+       end
+     end
+
+     {- Friction coefficient, in 1/ps. -}
+     do (fbeta=100) (store1)
+
+     evaluate ($bath=300.0)
+     evaluate ($nstep=500)
+     evaluate ($timestep=0.0005)
+
+     do (refy=mass) (store1)
+
+     do (mass=20) (store1)
+
+     igroup interaction 
+       (store1) (store1 or known)
+     end
+
+     {- turn on initial energy terms -}
+     flags exclude * include bond angle vdw end
+ 
+     minimize powell nstep=50  nprint=10 end
+
+     do (vx=maxwell($bath)) (store1)
+     do (vy=maxwell($bath)) (store1)
+     do (vz=maxwell($bath)) (store1)
+
+     flags exclude vdw include impr end
+
+     dynamics cartesian
+       nstep=50
+       timestep=$timestep
+       tcoupling=true temperature=$bath
+       nprint=$nstep
+       cmremove=false
+     end
+
+     flags include vdw end
+
+     minimize powell nstep=50 nprint=10 end
+
+     do (vx=maxwell($bath)) (store1)
+     do (vy=maxwell($bath)) (store1)
+     do (vz=maxwell($bath)) (store1)
+
+     dynamics cartesian
+       nstep=50
+       timestep=$timestep
+       tcoupling=true temperature=$bath
+       nprint=$nstep
+       cmremove=false
+     end
+
+     parameter
+       nbonds
+         rcon=2. nbxmod=-3 repel=0.75
+       end
+     end
+
+     minimize powell nstep=100 nprint=25 end
+
+     do (vx=maxwell($bath)) (store1)
+     do (vy=maxwell($bath)) (store1)
+     do (vz=maxwell($bath)) (store1)
+
+     dynamics cartesian
+       nstep=$nstep
+       timestep=$timestep
+       tcoupling=true temperature=$bath
+       nprint=$nstep
+       cmremove=false
+     end
+
+     {- turn on all energy terms -}
+     flags include dihe ? end
+
+     {- set repel to ~vdw radii -}
+     parameter
+       nbonds
+         repel=0.89
+       end
+     end
+
+     minimize powell nstep=500 nprint=50 end
+
+     flags exclude * include bond angl impr dihe vdw end
+
+     {- return masses to something sensible -}
+     do (mass=refy) (store1)
+
+     do (vx=maxwell($bath)) (store1)
+     do (vy=maxwell($bath)) (store1)
+     do (vz=maxwell($bath)) (store1)
+
+     dynamics cartesian
+       nstep=$nstep
+       timestep=$timestep
+       tcoupling=true temperature=$bath
+       nprint=$nstep
+       cmremove=false
+     end
+
+     {- some final minimisation -}
+     minimize powell
+       nstep=500
+       drop=40.0
+       nprint=50
+     end
+
+     print thres=0.02 bonds
+     print thres=5. angles
+
+   end if
+  
+   fix selection=( none ) end
+
+ end if
+
+ set echo=false end
+ show sum(1) (not(known))
+ if ( $result < 100 ) then
+   for $id in id (not(known)) loop print
+     show (segid) (id $id)
+     evaluate ($segid=$result)
+     show (resname) (id $id)
+     evaluate ($resname=$result)
+     show (resid) (id $id)
+     evaluate ($resid=$result)
+     show (name) (id $id)
+     evaluate ($name=$result)
+     buffer message
+       display unknown coordinates for atom: $segid[a4] $resname[a4] $resid[a4] $name[a4]
+     end
+   end loop print
+ else
+   buffer message
+     display unknown coordinates for more than 100 atoms
+   end
+ end if
+ set echo=true end
+
+ if (&set_bfactor=true) then
+   do (b=&bfactor) ( all )
+ else
+   show ave(b) (known and not(store1))
+   do (b=$result) (store1 and (attr b < 0.01))
+ end if
+
+ if (&set_occupancy=true) then
+   do (q=&occupancy) ( all )
+ end if
+
+ set echo=false end
+ show sum(1) (store1)
+ if ( $result < 100 ) then
+   for $id in id (store1) loop print
+     show (segid) (id $id)
+     evaluate ($segid=$result)
+     show (resname) (id $id)
+     evaluate ($resname=$result)
+     show (resid) (id $id)
+     evaluate ($resid=$result)
+     show (name) (id $id)
+     evaluate ($name=$result)
+     buffer message
+       display coordinates built for atom: $segid[a4] $resname[a4] $resid[a4] $name[a4]
+     end
+   end loop print
+ else
+   buffer message
+     display coordinates built for more than 100 hundred atoms
+   end
+ end if
+ set echo=true end
+
+ set remarks=reset end
+ set remarks=accumulate end
+
+ buffer message
+   to=remarks
+   dump
+ end
+
+ write structure output=&structure_outfile end
+
+ if ( &pdb_o_format = true ) then
+   write coordinates format=PDBO output=&coordinate_outfile end
+ else
+   write coordinates output=&coordinate_outfile end
+ end if   
+
+ stop
+

@@ -1,0 +1,3 @@
+pdbfile,pdbout,dir_xyzout,mapfn,mtzfn,caRes,scRes,caRad,scRad,scReduction,popsize,verbose,backtrack,rotLib,nmodels,mconly,sconly,opsax,natt,cacaCutoff,a,b,c,alpha,beta,gamma,sg,resolution,f1label,sigf1label,f2label,phiclabel,usefreer,freeRlabel,n,poorOnly,poorThreshold,loopres,start,stop,chainid,modelN2C,nativeBfac,mcBfac,scBfac,minXSig,maxXSig,edOpt,allOpt
+
+

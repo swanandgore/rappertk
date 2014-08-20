@@ -1,0 +1,7489 @@
+#LyX 1.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 221
+\textclass article
+\begin_preamble
+\addtolength{\oddsidemargin}{-50pt}
+\addtolength{\voffset}{-50pt}
+\addtolength{\textwidth}{100pt}
+\addtolength{\textheight}{100pt}
+
+
+\usepackage{xspace}
+\newcommand{\phipsi}{$\phi,\psi$\xspace}
+\newcommand{\eg}{e.g.\xspace}
+\newcommand{\etc}{etc.\xspace}
+\newcommand{\dfs}{\textsc{dfs}~}
+\newcommand{\cpp}{\textsc{c++}\xspace}
+\newcommand{\python}{\textsc{python}\xspace}
+\newcommand{\swig}{\textsc{swig}\xspace}
+\newcommand{\pdb}{\textsc{PDB}\xspace}
+\newcommand{\gabb}{\textsc{GABB}\xspace}
+\newcommand{\rapper}{\textsc{rapper}\xspace}
+\newcommand{\rappertk}{\textit{Rapper}\textbf{tk}\xspace}
+\newcommand{\probe}{\textsc{probe}\xspace}
+\newcommand{\ie}{i.e.\xspace}
+\newcommand{\ca}{$C_\alpha$\xspace}
+\newcommand{\chir}{$\chi$}
+\newcommand{\CA}[1]{${C_\alpha}^{#1}$~}
+\newcommand{\CB}[1]{${C_\beta}^{#1}$~}
+\newcommand{\C}[1]{$C^{#1}$~}
+\newcommand{\N}[1]{$N^{#1}$\xspace}
+\newcommand{\cO}[1]{$O^{#1}$\xspace}
+
+
+\newcommand{\Ang}[1]{${#1}$\AA\xspace}
+
+\newcommand{\degr}[1]{${#1}^o$\xspace}
+\end_preamble
+\language english
+\inputencoding auto
+\fontscheme default
+\graphics default
+\paperfontsize 12
+\spacing onehalf 
+\papersize Default
+\paperpackage a4
+\use_geometry 0
+\use_amsmath 0
+\use_natbib 0
+\use_numerical_citations 0
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\quotes_times 2
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+
+\layout Title
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ : a versatile engine for discrete restraint-based conformational sampling
+ of macromolecules
+\layout Author
+
+Swanand P.
+ Gore
+\begin_inset Foot
+collapsed true
+
+\layout Standard
+
+corresponding author.
+\end_inset 
+
+, Anjum M.
+ Karmali and Tom L.
+ Blundell
+\layout Address
+
+email address : {swanand, anjum, tom}@cryst.bioc.cam.ac.uk
+\layout Address
+
+Institutional Address : Department of Biochemistry, University of Cambridge,
+ Tennis Court Road, Cambridge CB2 1GA United Kingdom.
+\layout Address
+\pagebreak_bottom 
+Phone : +44-1223-766031
+\layout Abstract
+
+
+\emph on 
+Background
+\emph default 
+ Macromolecular structures are modeled by conformational optimization within
+ experimental and knowledge-based restraints.
+ Discrete restraint-based sampling generates high-quality structures within
+ these restraints and facilitates further refinement in a continuous all-atom
+ energy landscape.
+ This approach has been used successfully for protein loop modeling, comparative
+ modeling and electron density fitting in X-ray crystallography.
+\layout Abstract
+
+
+\emph on 
+Results
+\emph default 
+ Here we present a software toolkit (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+) which generalizes discrete restraint-based sampling for use in structural
+ biology.
+ Modular design and multi-layered architecture enables 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ to sample conformations of any macromolecule at many levels of detail and
+ within a variety of experimental restraints.
+ Performance against a 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+-tracing benchmark shows that the efficiency has not suffered despite the
+ overhead required by this flexibility.
+ We demonstrate the toolkit's capabilities by building high-quality 
+\begin_inset Formula $\beta$
+\end_inset 
+
+-sheets and by introducing restraint-driven sampling.
+ RNA sampling is demonstrated by rebuilding a protein-RNA interface.
+ Ability to construct arbitrary ligands is used in sampling protein-ligand
+ interfaces within electron density.
+ Finally, secondary structure and shape information derived from EM are
+ combined to generate multiple conformations of a protein consistent with
+ the observed density.
+\layout Abstract
+\pagebreak_bottom 
+
+\emph on 
+Conclusion
+\emph default 
+ Through its modular design and ease of use, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ enables exploration of a wide variety of interesting avenues in structural
+ biology.
+ This toolkit, with illustrative examples, is freely available to academic
+ users from http://www-cryst.bioc.cam.ac.uk\SpecialChar \-
+/~swanand/mysite/rtk/index.html.
+\layout Section
+
+Background
+\layout Standard
+
+Atomic structures of biological macromolecules give key insights into their
+ biochemical function and are determined by conformational optimization
+ within the landscape defined by experimentally derived and knowledge-based
+ restraints.
+ Molecular dynamics and minimization, implemented in popular softwares like
+ Charmm (
+\begin_inset LatexCommand \cite{charmm}
+
+\end_inset 
+
+) and Gromacs (
+\begin_inset LatexCommand \cite{gromacs}
+
+\end_inset 
+
+), play a significant role in this process.
+ However, all-atom forcefields used by these methods give rise to complex
+ and rugged energy landscapes, which often create substantial difficulties
+ in locating meaningful minima.
+ This task can be facilitated if seed conformations are obtained within
+ convergence radii of these minima.
+\layout Standard
+
+Recent studies have illustrated this for proteins in various contexts (see
+ 
+\begin_inset LatexCommand \cite{rapperReview}
+
+\end_inset 
+
+).
+ Analyses of high resolution structures have yielded discrete preferred
+ conformational states for protein backbones and sidechains (
+\begin_inset LatexCommand \cite{RNAlib}
+
+\end_inset 
+
+, 
+\begin_inset LatexCommand \cite{isites}
+
+\end_inset 
+
+, 
+\begin_inset LatexCommand \cite{PRLlib}
+
+\end_inset 
+
+, 
+\begin_inset LatexCommand \cite{bbdepRotlib}
+
+\end_inset 
+
+).
+ Protein loops modeled with weighted sampling of knowledge-based preferences,
+ excluded volume restraints and ideal stereochemistry, when further optimized
+ with an all-atom forcefield, have accurately predicted the native conformation
+ (
+\begin_inset LatexCommand \cite{hierarchical_loop}
+
+\end_inset 
+
+, 
+\begin_inset LatexCommand \cite{RAPPER_amber}
+
+\end_inset 
+
+).
+ The combination of knowledge-based local preferences (for fragments smaller
+ than 10 residues) with non-local physical energy terms like hydrophobic
+ burial and hydrogen bonding in a simulated annealing protocol has been
+ effective in protein structure prediction (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+eg
+\end_inset 
+
+ 
+\begin_inset LatexCommand \cite{BakerStrPredictionScience2005}
+
+\end_inset 
+
+), homology modeling (
+\begin_inset LatexCommand \cite{homologyRosettaMD}
+
+\end_inset 
+
+) and structure determination (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+eg
+\end_inset 
+
+ 
+\begin_inset LatexCommand \cite{BakerRDC}
+
+\end_inset 
+
+).
+ Interpretations of crystallographic data of both high (
+\begin_inset LatexCommand \cite{rapperKnowledgeXray}
+
+\end_inset 
+
+) and low (
+\begin_inset LatexCommand \cite{rapperLowResolution}
+
+\end_inset 
+
+) resolutions have been achieved by combining discrete and continuous approaches.
+\layout Standard
+
+The promise of this hybrid approach has not yet been fully exploited; for
+ instance it has not been used to assess conformational ensembles to enhance
+ structure determination with NMR and EM data, to explore flexibility of
+ ligands and RNA and to examine diversity at macromolecular interfaces.
+ Our approach, encoded in 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ (
+\begin_inset LatexCommand \cite{RAPPER}
+
+\end_inset 
+
+), has been applied succesfully to a range of protein modeling problems
+ where restraints have been introduced from knowledge of structures or experimen
+tal obsvservations but it is limited in its applicability due to its inflexibili
+ty in sampling direction and molecular representation.
+ Indeed its search algorithm, which is a blend of genetic algorithm and
+ branch-and-bound (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+gabb
+\end_inset 
+
+), is hard to modify.
+ Hence we envisaged an alternative framework that would provide search algorithm
+s, knowledge-based confomational preferences, sampling and building techniques,
+ analogous to MD softwares providing a platform to run annealing schedules.
+ This framework has been implemented as 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+, a flexible, robust and easy-to-use software library which generalizes
+ and builds upon the major concepts from 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ methodology in a modular fashion.
+ This makes discrete restraints-based conformational sampling possible in
+ various novel scenarios and reproduces 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ functionality as special case.
+ In the following sections we describe the design, implementation, benchmarking
+ and demonstrations of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+.
+\layout Section
+
+Implementation
+\layout Standard
+
+Fig.
+\begin_inset LatexCommand \ref{peptbuilder}
+
+\end_inset 
+
+ shows a typical step in 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+-like incremental sampling.
+ This involves three distinct steps : sampling of dihedral angles 
+\begin_inset Formula $\phi,\psi,\omega$
+\end_inset 
+
+, building coordinates for the next peptide using those of the previous
+ and checking the 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+-positional restraint.
+ This suggests the concepts of sampler, builder and restraint.
+ 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ maintains a population of conformers and executes these steps repeatedly
+ on them according to 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+gabb
+\end_inset 
+
+.
+ This can be abstracted as search strategy which is responsible for correct
+ ordering and execution of samplers, builders and restraints.
+ In the modular, layered design of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ (Fig.
+\begin_inset LatexCommand \ref{archi}
+
+\end_inset 
+
+), application scripts reside at a level higher than search strategies -
+ they carry out the task of preprocessing, creating necessary builders,
+ samplers and restraints for the problem at hand, and passing them to the
+ appropriate strategy.
+\layout Standard
+
+We have chosen a 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cpp
+\end_inset 
+
+/
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+swig
+\end_inset 
+
+/
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+python
+\end_inset 
+
+ style of coding, whereby the interface of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cpp
+\end_inset 
+
+ code is exposed in 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+python
+\end_inset 
+
+ by generating suitable wrappers automatically with 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+swig
+\end_inset 
+
+.
+ Such architecture has become popular among academic softwares (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+eg 
+\end_inset 
+
+ Xplor-NIH 
+\begin_inset LatexCommand \cite{xplorNIH}
+
+\end_inset 
+
+) as it provides robustness without losing the fluidity needed in academic
+ implementations.
+ We now describe the major concepts in more detail.
+\layout Subsection
+
+Coordinates
+\layout Standard
+
+Different sets of coordinates need to be maintained in order to allow for
+ sets of conformers, either for population-based searches or for using ensemble
+ averaged restraints.
+ Some coordinates are known and fixed, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+eg 
+\end_inset 
+
+ secondary structure elements in a loop building exercise.
+ Each point has an associated hard-sphere (van der Waals) radius adapted
+ from those used in 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+probe
+\end_inset 
+
+(
+\begin_inset LatexCommand \cite{PROBE}
+
+\end_inset 
+
+).
+ A high-level application script generates the coordinates.
+ Builders and restraints operate upon specified indices in given coordinates.
+\layout Subsection
+
+Samplers
+\layout Standard
+
+A sampler chooses a datum from an underlying distribution of conformational
+ preferences by random weighted sampling.
+ Well-known examples are weighted 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+phipsi 
+\end_inset 
+
+ sampling for protein backbone (
+\begin_inset LatexCommand \cite{phipsilib}
+
+\end_inset 
+
+), RNA backbone (
+\begin_inset LatexCommand \cite{RNAlib}
+
+\end_inset 
+
+) and sidechain rotamer sampling (
+\begin_inset LatexCommand \cite{PRLlib}
+
+\end_inset 
+
+), all derived from high quality crystallographic structures.
+ New types of sampling can be easily incorporated by writing a new sampler
+ for the corresponding builder, say tri-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+phipsi 
+\end_inset 
+
+ sampler for tripeptide fragments, substructure sampler 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+etc
+\end_inset 
+
+
+\layout Subsection
+
+Restraints
+\layout Standard
+
+Values of various geometric entities are useful in constraining the conformation
+al space, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+eg 
+\end_inset 
+
+ internuclear distances derived from NMR NOEs, electron-density from X-ray
+ analyses, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca 
+\end_inset 
+
+ positional information from templates in comparative modelling, and so
+ on.
+ A restraint object holds the information of points on which it is to be
+ tested, and the method of testing.
+ A restraint is generally binary; it is either satisfied or violated.
+ A restraint can be also be optional, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ie
+\end_inset 
+
+ it can be discarded if sampling consistently fails due to that restraint.
+\layout Subsection
+
+Builders and followers
+\layout Standard
+
+A builder consists of the indices of coordinates it uses and those it calculates
+, along with the calculation technique.
+ For instance, the 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+phipsi 
+\end_inset 
+
+-based peptide backbone builder uses coordinates of {
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+C{i-2}
+\end_inset 
+
+, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{i-1}
+\end_inset 
+
+, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i-1}
+\end_inset 
+
+} to calculate coordinates of {
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+C{i-1}
+\end_inset 
+
+, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{i}
+\end_inset 
+
+, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i}
+\end_inset 
+
+}; {
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+C{i-1}
+\end_inset 
+
+, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{i}
+\end_inset 
+
+, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i}
+\end_inset 
+
+, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CB{i}
+\end_inset 
+
+, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+C{i}
+\end_inset 
+
+, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{i+1}
+\end_inset 
+
+} coordinates are used by a backbone-dependent sidechain builder; and so
+ on.
+ Thus builder is an abstraction of coordinate calculations operating on
+ input and output indices within a coordinate set.
+ A builder may have an empty input set or may have only known coordinates
+ as inputs, in which case it is called a 
+\emph on 
+seed
+\emph default 
+ builder (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+eg
+\end_inset 
+
+ peptide N terminal anchor builder).
+ There is a maximum number of trials a builder can undertake to extend a
+ conformation; this will depend upon the conformational space available
+ to sample.
+ In order to avoid futile sampling, the builder may implement a session
+ in which only unique samples are used, thus improving sampling diversity.
+ Follower is a concept specific to population-based searches.
+ A builder is another's follower if it is advisable to execute it in the
+ same population-search step as the leading builder.
+ This was an improvisation first used during 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+-trace scripting to build sidechain immediately after the relevant mainchain.
+\layout Subsection
+
+Sampling Strategy
+\layout Standard
+
+The sampling strategy orchestrates the builders and restraints systematically
+ to generate conformations.
+ The sampling strategy can be divided into ordering and execution of restraints
+ and builders.
+ Automatic ordering allows the application script to create builders and
+ restraints in any convenient order.
+ Because strategies are coded in 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+python
+\end_inset 
+
+, it is easy to write a new strategy.
+\layout Subsubsection
+
+Ordering of builders and restraints
+\layout Standard
+
+A correct strategy must calculate the order of execution for builders and
+ restraints.
+ There is a partial ordering induced on builders due to their input and
+ output coordinates, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ie 
+\end_inset 
+
+ a builder may not be executed unless its input coordinates have been computed,
+ except for seed builders.
+ Thus there is a digraph of builders, with possibly many seed builders and
+ others depending on one or more builders.
+ Restraints can be checked only after all coordinates to be tested have
+ been computed, hence there is restraint-builder dependence.
+ An efficient strategy must test a restraint as early as possible in order
+ to avoid sampling the disallowed conformational space.
+ Once a builder succeeds or fails in its task, an efficient sampling strategy
+ must use the builder dependence digraph to identify the builder to be attempted
+ next.
+ The strategy currently implemented in 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ determines the builder order by topologically sorting the builder digraph,
+ more specifically as follows : 
+\layout Itemize
+
+In case of multiple seed (parentless) builders, a dummy builder is assumed
+ to be their parent.
+ A procedure similar to 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+dfs 
+\end_inset 
+
+ (depth first search) is used to assign unique parents to all nodes, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ie 
+\end_inset 
+
+ convert the digraph into a tree.
+ A node appears as child of another node only if the latter is the only
+ unvisited parent of the former.
+ 
+\layout Itemize
+
+The size of subtree rooted at each node is found.
+\layout Itemize
+
+Using 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+dfs 
+\end_inset 
+
+ again, an order is established for the nodes.
+ When a node is popped off the 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+dfs 
+\end_inset 
+
+ stack, its children are pushed onto the stack in the ascending order of
+ subtree sizes.
+ 
+\layout Itemize
+
+The order thus obtained is the final ordering used by the default strategy.
+ If a builder fails, its unique parent builder may be executed, and the
+ results of the parent and all its children discarded.
+ If a builder succeeds, the builder next in order may be called.
+ 
+\layout Itemize
+
+From this builder order, restraints are identified for each builder such
+ that they have all the necessary points computed after the builder.
+ Thus every builder has associated restraints to check after it is executed.
+\layout Standard
+
+As an illustration, consider conformational sampling of a three residue
+ peptide (see Fig.
+\begin_inset LatexCommand \ref{builderdep}
+
+\end_inset 
+
+) under the 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ spherical positional restraints.
+ Four kinds of builders are employed.
+ NanchorBuilder uses the first two 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ restraints to anchor the peptide.
+ Backbone-dependent sidechain builder is used for sampling sidechains.
+ Since this builder requires parts of the backbone from adjacent residues
+ also, two dummy Gly residues are added, one each at the beginning and end
+ of the tripeptide.
+ PeptideBuilder is used to build peptides in forward and backward directions.
+ NanchorBuilder is the seed builder as it has no input points.
+ Reverse PeptideBuilder, PeptideBuilder-1 and SidechainBuilder-1 depend
+ on it because their input coordinates are partly or completely contained
+ in its output coordinates.
+ Similarly, SidechainBuilder-3 depends upon PeptideBuilder-1 and PeptideBuilder-
+2.
+ Restraints CARestraint-1 and 2 depend upon PeptideBuilder-1 and 2.
+ From these dependences, a directed graph can be constructed with builders
+ and restraints as nodes.
+ Topological sort on this graph produces a linear order of the builders,
+ which suggests the builder to be tried after a successful (restraints-satisfyin
+g) builder.
+ The backward ordering (or 
+\shape italic 
+fallback ordering
+\shape default 
+) determines the builder to be called after an unsuccessful (not satisfying
+ restraints) builder.
+\layout Subsubsection
+
+Execution of builders and restraints
+\layout Standard
+
+Once the ordering among builders and restraints is established, various
+ search strategies can be used to sample conformational space.
+ The simplest is an exhaustive search, where each restraints-satisfying
+ option available to a builder is explored.
+ 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper 
+\end_inset 
+
+ uses PopulationSearch algorithm (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+gabb
+\end_inset 
+
+) as mentioned earlier.
+ 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+gabb
+\end_inset 
+
+ limits the number of restraints to be checked at every extension step and
+ provides a pool of fit parents to build upon.
+ Each parent is allowed to contribute more than one child and parents compete
+ to put their children in the children pool.
+ In addition to PopulationStrategy, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ provides a minor variation which allows limited backtracking (using fallbacks
+ described earlier).
+ The number and size of backtrack steps can be specified.
+ In cases where the parents are not extensible at a certain step, the population
+ search is restarted some steps earlier, determined by number and size of
+ backtrack step specified.
+ This saves the cost of starting from first step in case of failure at an
+ advanced step.
+\layout Subsection
+
+Spatial grid for checking clashes
+\layout Standard
+
+Steric clashes are a very important restraint on conformational freedom.
+ Hence the output of every builder is verified with a 3D grid that uses
+ geometric caching to check the clashes efficiently.
+ A GridHelper is provided to the grid to modify clash-checking functionality
+ according to the application requirements.
+ For instance, in atomic models, first and second covalent neighbours of
+ an atom need not be clash-checked, the van der Waals radius of sidechain
+ atoms needs to be reduced due to discrete sidechain rotameric states, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+etc
+\end_inset 
+
+
+\layout Subsection
+
+PDB reader, model renderer 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+etc
+\end_inset 
+
+
+\layout Standard
+
+The i/o functionality is written in 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+python
+\end_inset 
+
+.
+ PDB reader is largely adapted from a previous work (
+\begin_inset LatexCommand \cite{provat}
+
+\end_inset 
+
+).
+ ModelRenderer is currently a PDB writer, but can be extended to write models
+ in other formats too.
+ ModelRenderer is invoked by the strategy when it succeeds in sampling a
+ conformation within given restraints.
+\layout Subsection
+
+Application scripts
+\layout Standard
+
+Application scripts are high-level 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+python
+\end_inset 
+
+ scripts which generate problem-specific context by preprocessing given
+ information and creating necessary 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ components to be used by the search strategy.
+ They can be invoked as execution modes from 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ launcher script.
+ Application scripts are assisted by various utility scripts like the one
+ for creating a standard set of builders and restraints.
+\layout Section
+
+Results
+\layout Subsection
+
+Benchmarking
+\layout Standard
+
+As tracing a polypeptide chain is central to all the tasks performed by
+ 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+, we compare 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+'s performance at chain tracing with that of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ for 9 large (> 300 residues) proteins from the 
+\begin_inset LatexCommand \cite{catrace}
+
+\end_inset 
+
+ benchmark set (see Table 
+\begin_inset LatexCommand \ref{targetSet}
+
+\end_inset 
+
+).
+ Ensembles of 50 models were generated and the average RMSD values for the
+ ensembles calculated.
+ If the conformational search could not generate a model within 24 hours
+ of computational time, the search was considered unsuccessful.
+ Mainchain-only models were generated using 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ restraint radii of 0.5, 1, 1.5 and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{2}
+\end_inset 
+
+.
+ The 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ restraint threshold defines the radius of the sphere within which the 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ atom of the modelled residue is restrained to lie.
+ The centre of this sphere is given by the native 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ position.
+ All-atom models were generated under 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ restraint of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{1}
+\end_inset 
+
+ and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{2}
+\end_inset 
+
+ restraint on the centroid of the sidechain atoms.
+ The van der Waals radii were reduced by 25% to compensate for the fact
+ that only specific sidechain rotamers were allowed.
+ Sidechain centroid restraint places and orients the side chain atoms with
+ respect to the mainchains and affects bulky side chains more than the smaller
+ sidechain groups.
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ can trace either from N to C terminal (forward) or in the C to N (backward)
+ directions, with and without sidechains, in guided or standard sampling
+ modes.
+ Standard sampling is 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+-like 
+\begin_inset Formula $\phi,\psi$
+\end_inset 
+
+ sampling which is unaware of the 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ restraint to be satisfied.
+ Such sampling can be the bottleneck when restraints are tight or only a
+ small portion of the restraint spheres are reachable geometrically.
+ Hence we have also incorporated 
+\emph on 
+guided
+\emph default 
+ sampling in which the sampler is aware of the restraint and produces samples
+ within that restraint.
+ As shown in Fig.
+\begin_inset LatexCommand \ref{guidedSampling}
+
+\end_inset 
+
+, the location of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i}
+\end_inset 
+
+ is defined by 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+C{i-2}
+\end_inset 
+
+, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{i-1}
+\end_inset 
+
+, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i-1}
+\end_inset 
+
+ and 
+\begin_inset Formula $r$
+\end_inset 
+
+ (distance between 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i-1}
+\end_inset 
+
+,
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i}
+\end_inset 
+
+), 
+\begin_inset Formula $\alpha$
+\end_inset 
+
+ (angle 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{i-1}
+\end_inset 
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i-1}
+\end_inset 
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i}
+\end_inset 
+
+), 
+\begin_inset Formula $\theta$
+\end_inset 
+
+ (torsion angle 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+C{i-2}
+\end_inset 
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{i-1}
+\end_inset 
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i-1}
+\end_inset 
+
+-
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i}
+\end_inset 
+
+).
+ Thus the restraint sphere is sampled spatially by the guided sampler to
+ obtain 
+\begin_inset Formula $r,\alpha,\theta$
+\end_inset 
+
+ samples.
+ Corresponding 
+\begin_inset Formula $\phi,\psi,\omega$
+\end_inset 
+
+ values are found using a precalculated mapping from 
+\begin_inset Formula $r,\alpha,\theta$
+\end_inset 
+
+ to allowed 
+\begin_inset Formula $\phi,\psi,\omega$
+\end_inset 
+
+.
+ Since this mapping is one-to-many, a random sample is taken from available
+ 
+\begin_inset Formula $\phi,\psi,\omega$
+\end_inset 
+
+ values.
+ Such sampling ensures that the restraint sphere is sampled efficiently
+ while still using 
+\begin_inset Formula $\phi,\psi$
+\end_inset 
+
+ values from the allowed region of Ramachandran plot.
+\layout Subsubsection
+
+Mainchain modelling
+\layout Standard
+
+In addition to comparing the main chain modelling accuracy between 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+ 
+\backslash 
+rapper
+\end_inset 
+
+ and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ in standard forward mode, models were built in the backward (C to N) mode
+ in order to check whether the performance varies .
+ Table 
+\begin_inset LatexCommand \ref{ca:1}
+
+\end_inset 
+
+ shows the model accuracy under a spherical positional restraint of radius
+ 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{1}
+\end_inset 
+
+ on 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ atoms.
+ Similar values of mainchain and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ RMSDs obtained demonstrate that performance of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ is comparable to that of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ and consistent across the whole target set.
+ The low standard deviation values within each ensemble show that all the
+ three approaches produce tight clusters containing models that are all
+ equally acceptable.
+ Larger restraint radii result in looser restraints and give models that
+ deviate further from the native structures.
+ RMSD values in Table 
+\begin_inset LatexCommand \ref{ca:mc:all}
+
+\end_inset 
+
+ demonstrate that both 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ perform equally well under different 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ restraint thresholds.
+ For the restraint radius of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{0.5}
+\end_inset 
+
+ both 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ failed to find complete ensembles for proteins 4enl, 8abp and 8tln.
+ For 8tln, the conformational search repeatedly failed at Leu-133.
+ Since the conformational search builds one residue at a time, slight errors
+ introduced earlier can sometimes make it difficult to find a suitable conformat
+ion for a residue causing repeated failures at the same position.This limitation
+ can be circumvented by building the peptide chain in the reverse direction.
+ Using backward building for 8tln, 5 models could be found having an average
+ main chain RMSD of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{0.41}
+\end_inset 
+
+ (0.01) and a 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ RMSD of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{0.35}
+\end_inset 
+
+ (0.01).
+ Models for proteins 8abp and 4enl were built using the guided sampling
+ mode in 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+.
+ 
+\begin_inset Note
+collapsed true
+
+\layout Standard
+
+(Have to add the results when ready.)
+\end_inset 
+
+
+\layout Subsubsection
+
+All atom modelling
+\layout Standard
+
+As can be seen from Table 
+\begin_inset LatexCommand \ref{all_atom}
+
+\end_inset 
+
+, the model accuracies for 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ are comparable and do not vary significantly across the different proteins.
+ The average all atom RMSD for 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ for the entire protein set is 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{1.07}
+\end_inset 
+
+ and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{1.08}
+\end_inset 
+
+ respectively.
+ On using the guided sampling mode within 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ there is a 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{0.06}
+\end_inset 
+
+ to 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{0.08}
+\end_inset 
+
+ reduction in the main chain and a 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{0.07}
+\end_inset 
+
+ to 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{0.09}
+\end_inset 
+
+ reduction in the all atom RMSD values.
+ The average all atom RMSD over the target set also reduces to 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{1.0}
+\end_inset 
+
+.
+ The average 
+\begin_inset Formula $\chi_{1}$
+\end_inset 
+
+ error is comparable for 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+degr{42.3}
+\end_inset 
+
+) , 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+degr{42.0}
+\end_inset 
+
+) and guided sampling (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+degr{41.6}
+\end_inset 
+
+).
+ The average 
+\begin_inset Formula $\chi_{1,2}$
+\end_inset 
+
+ values for the three approaches are also similar, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+degr{42.4}
+\end_inset 
+
+ for 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+degr{42.4}
+\end_inset 
+
+ for 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+degr{42.1}
+\end_inset 
+
+ for 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ using guided sampling.
+\layout Subsubsection
+
+Computational Cost and Quality Check
+\layout Standard
+
+Model quality was assessed using PROCHECK (
+\begin_inset LatexCommand \cite{PROCHECK}
+
+\end_inset 
+
+).
+ All structures have main chain bond lengths and angles within the limits
+ of the standard deviation of their small molecule values and also have
+ good sidechain stereochemistries.
+ Computational cost scales with the size of the restraint sphere used to
+ generate the models.
+ As can be seen from Figure 
+\begin_inset LatexCommand \ref{mcCost}
+
+\end_inset 
+
+ the computational cost for 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ is less than that for 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ for restraint radii 0.5, 1, and 1.5 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{1.5}
+\end_inset 
+
+.
+ The average time taken by 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ under a 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ restraint of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{2}
+\end_inset 
+
+ is only slightly higher at 37 s/models compared to 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ which takes 32 s/model.
+ There is a visible improvement in speed at the restraint radius of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{0.5}
+\end_inset 
+
+.
+ This demonstrates that 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ is more able to find a solution within a very tight restraint network with
+ fewer failed attempts.
+ Figure 
+\begin_inset LatexCommand \ref{aaCost}
+
+\end_inset 
+
+ shows the computational cost for all-atom modelling of each protein in
+ the target set.
+ The time taken to build a successful all atom model by 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ is similar to that taken by 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+.
+ For 5cpa, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ repeatedly failed at TYR:198 which has an unusual 
+\begin_inset Formula $\omega$
+\end_inset 
+
+ angle of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+degr{154.5}
+\end_inset 
+
+.
+ 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ takes an average of 3323 s to find a solution whereas 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ is able to build a model in an average time period of 147 s.
+ On using guided sampling the computational cost siginificantly decreases.
+ The average time taken reduces to 69 s/model compared to the average time
+ of 165 s/model taken by 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ and 176 s/model by 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+.
+ Also on using guided sampling, the cost is nearly the same across the set,
+ irrespective of the stereochemistry of the individual structures.
+\layout Subsection
+
+Illustrations
+\layout Standard
+
+We now describe the use of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ to carry out some new sampling tasks.
+\layout Subsubsection
+
+Protein-ligand interface sampling in electron density
+\layout Standard
+
+Protein ligand interactions are central to understanding the roles of ligands
+ as well as the mechanisms of enzymes.
+ The approximate location of a ligand is often known but small ligands often
+ have poor electron density.
+ This scenario is suitable for automatically fitting various ligand conformation
+s into the density with 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+, thus creating an ensemble for further refinement.
+ From a recent paper on automatic modeling of ligands (
+\begin_inset LatexCommand \cite{autoProtligRefine}
+
+\end_inset 
+
+), we chose a medium resolution (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{2.6}
+\end_inset 
+
+) structure (1di9) of p38 kinase in complex with a quinazoline ligand.
+\layout Standard
+
+In order to describe the degrees of freedom in a ligand, a file format was
+ devised.
+ It describes the ligand's bootstrapping (init lines), rotatable bonds (rotbond
+ lines) and internal distance restraints (mindist lines).
+ Builders and restraints are created using the information given in this
+ file.
+ Covalent bond lengths and angles are not altered from the initial coordinates
+ given as input.
+\layout Standard
+
+Depending on ligand proximity, small sections of protein chains are identified
+ and sampled using a loop sampling and closure procedure.
+ Loop closure samples the location of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i}
+\end_inset 
+
+ given the locations of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i-1}
+\end_inset 
+
+ and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i+1}
+\end_inset 
+
+ as shown in Fig.
+\begin_inset LatexCommand \ref{loopClosure}
+
+\end_inset 
+
+.
+ Sidechain centroid restraint and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ restraint are lenient close to ligand.
+\layout Standard
+
+Electron density restraints are employed using the excellent Clipper libraries
+ (
+\begin_inset LatexCommand \cite{clipper}
+
+\end_inset 
+
+) for crystallographic computations.
+ The deposited PDB structure is used to phase the structure factor amplitudes
+ and to obtain an electron density map.
+ EDrestraint is satisfied by builder outputs which lie in reasonable density
+ (
+\begin_inset Formula $>0.25\sigma$
+\end_inset 
+
+) and have good mean density (
+\begin_inset Formula $>1\sigma$
+\end_inset 
+
+).
+ EDrestraints are optional except for the ligand.
+ EDrestraints operate on the output of each builder.
+\layout Standard
+
+This scheme of flexible-protein flexible-ligand yields an ensemble of protein-li
+gand interface conformations which are consistent with the expected degrees
+ of freedom of ligand, electron density, hard-sphere clash restraints and
+ covalent geometry of the protein.
+ Further refinement and ensemble interpretation will be addressed in future
+ work.
+ Apart from crystallographic application, such sampling can be used by small
+ molecule docking programs also to generate trial conformers of the ligand
+ and protein.
+\layout Subsubsection
+
+Protein-RNA interface sampling
+\layout Standard
+
+Although RNA conformational preferences are harder to identify due to the
+ much larger conformational space (7 backbone dihedral angles), recent analysis
+ has revealed the rotameric nature of the RNA backbone (
+\begin_inset LatexCommand \cite{RNAlib}
+
+\end_inset 
+
+).
+ We use these preferences to extend the RNA chain as shown in Fig.
+\begin_inset LatexCommand \ref{rnaBuilder}
+
+\end_inset 
+
+.
+ Bootstrapping copies the initial few atoms from the given structure to
+ the region specified by restraints on them.
+ Incremental build of the RNA chain is done by RNAsuiteBuilder, which depends
+ on atoms {C5*, C4*, C3*} and builds atoms {O3*, P, O1P, O2P, O5*, C5*,
+ C4*, C3*} along with sugar and base.
+\layout Standard
+
+In this illustration, we choose protein chain A and RNA chain E from a recently
+ solved protein-RNA complex (helicase-core region of Vasa bound to a single
+ stranded RNA 
+\begin_inset LatexCommand \cite{protRNAexample}
+
+\end_inset 
+
+).
+ We identify sections of protein chain in close proximity to the RNA.
+ These sections are later sampled as loops with loop closure and restrained
+ with 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ and sidechain centroid positional restraints.
+ RNA bootstrap builder regards {C5*, C4*, C3*, P, O1P, O2P, O5*} atoms of
+ the first nucleotide as a rigid body and translates/rotates it so that
+ C5*, C4*, C3* atoms are within 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{2}
+\end_inset 
+
+ of native positions.
+ During incremental building, the C3* atom is restrained to lie within 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{2}
+\end_inset 
+
+ of the native C3* atom.
+ As before, the deposited PDB structure is used to phase the deposited structure
+ factor amplitudes and builders are restrained to build within a mean electron
+ density of 
+\begin_inset Formula $1\sigma$
+\end_inset 
+
+.
+\layout Standard
+
+Generation of multiple conformations of protein-RNA interface with 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ can be useful in deriving multiple interpretations permitted by the crystallogr
+aphic data.
+ Interface diversity thus assessed may lead to novel insights into function.
+ This issue will be addressed in detail in a future study.
+\layout Subsubsection
+
+Sampling 
+\begin_inset Formula $\beta$
+\end_inset 
+
+ sheets
+\layout Standard
+
+In low-resolution crystallographic or EM data, salient features of the structure
+ (
+\begin_inset Formula $\beta$
+\end_inset 
+
+-sheet or 
+\begin_inset Formula $\alpha$
+\end_inset 
+
+-helix) are more detectable than the terminal regions or loops, making it
+ desirable to start building a model at such features.
+ 
+\begin_inset Formula $\alpha$
+\end_inset 
+
+-helices are easier to sample than 
+\begin_inset Formula $\beta$
+\end_inset 
+
+-sheets because hydrogen bond restraints in helices are sequential unlike
+ those in sheets.
+ Hence sequential sampling is inefficient for the later strands in a sheet.
+ As 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ is not restricted to sequential sampling, a 
+\begin_inset Formula $\beta$
+\end_inset 
+
+-hairpin can be built as shown in Fig.
+\begin_inset LatexCommand \ref{betaHairpin}
+
+\end_inset 
+
+, by bootstrapping at the linker of the strands and extending in forward
+ and reverse directions.
+ The building order is zigzag and helps in maintaining strict hydrogen bond
+ geometry (distance O-N within between 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{1.5}
+\end_inset 
+
+,
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{3.5}
+\end_inset 
+
+ angle C-O-N > 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+degr{100}
+\end_inset 
+
+).
+ We observed that this builder order is more efficient in sampling the hairpin
+ under positional and hydrogen bonding restraints, than the simple sequential
+ order.
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ extends this scheme of sampling 
+\begin_inset Formula $\beta$
+\end_inset 
+
+-sheets to parallel sheets and arbitrarily many strands (see Fig.
+\begin_inset LatexCommand \ref{betaSheet}
+
+\end_inset 
+
+).
+ If residue positions 
+\begin_inset Formula $(...i-1,i,i+1...)$
+\end_inset 
+
+ correspond to positions 
+\begin_inset Formula $(...j-1,j,j+1...)$
+\end_inset 
+
+ in parallel 
+\begin_inset Formula $\beta$
+\end_inset 
+
+-sheets, hydrogen bonding distance restraints are applied on (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{i}
+\end_inset 
+
+,
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cO{j-1}
+\end_inset 
+
+), (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cO{i}
+\end_inset 
+
+,
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{j+1}
+\end_inset 
+
+), (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{i+2}
+\end_inset 
+
+,
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cO{j+1}
+\end_inset 
+
+), (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cO{i+2}
+\end_inset 
+
+,
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{j+3}
+\end_inset 
+
+) 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+etc
+\end_inset 
+
+ In antiparallel sheets, where residue positions 
+\begin_inset Formula $(...i-1,i,i+1...)$
+\end_inset 
+
+ correspond to positions 
+\begin_inset Formula $(...j+1,j,j-1...$
+\end_inset 
+
+), distance restraints are applied on (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{i}
+\end_inset 
+
+,
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cO{j}
+\end_inset 
+
+), (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cO{i}
+\end_inset 
+
+,
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{j}
+\end_inset 
+
+), (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{i+2}
+\end_inset 
+
+,
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cO{j-2}
+\end_inset 
+
+), (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cO{i+2}
+\end_inset 
+
+,
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{j-2}
+\end_inset 
+
+) 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+etc
+\end_inset 
+
+ Sheets with multiple strands are tricky due to the variable number of hydrogen
+ bonds between adjacent strands.
+ Additionally, a strand may be linked to other strands in both parallel
+ and antiparallel arrangements, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+eg
+\end_inset 
+
+ in a 3-stranded sheet with corresponding residue positions 
+\begin_inset Formula $(...i-1,i,i+1...)$
+\end_inset 
+
+, 
+\begin_inset Formula $(...j-1,j,j+1...)$
+\end_inset 
+
+ and 
+\begin_inset Formula $(...k+1,j,j-1...)$
+\end_inset 
+
+, residue 
+\begin_inset Formula $j$
+\end_inset 
+
+ is involved in (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{j}
+\end_inset 
+
+,
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cO{i-1}
+\end_inset 
+
+), (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cO{j}
+\end_inset 
+
+,
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{i+1}
+\end_inset 
+
+) while residue 
+\begin_inset Formula $j+1$
+\end_inset 
+
+ forms hydrogen bonds (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{j+1}
+\end_inset 
+
+,
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cO{k-1}
+\end_inset 
+
+), (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cO{j+1}
+\end_inset 
+
+,
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{k-1}
+\end_inset 
+
+); this pattern repeats every alternate residue.
+ This scheme is used in the next example.
+\layout Subsubsection
+
+All-atom model generation from approximate secondary structure information
+ and particle shape
+\layout Standard
+
+Techniques like EM and SAXS are valued for their ability to estimate macromolecu
+lar shape and to help in global relative positioning of parts of the particle.
+ Automatic identification of secondary structures and prediction of their
+ topology is possible (
+\begin_inset LatexCommand \cite{sheetTracer}
+
+\end_inset 
+
+ 
+\begin_inset LatexCommand \cite{ssTopEM}
+
+\end_inset 
+
+) by morphological analysis of EM data.
+ Coupled with secondary structure prediction from sequence, this generates
+ approximate positional restraints on 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ atoms in secondary structures.
+ We demonstrate here that 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ can combine the shape and secondary structure positional restraints to
+ generate atomic models.
+\layout Standard
+
+In order to simulate this scenario, we generated an artificially blurred
+ electron density map at 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{10}
+\end_inset 
+
+ resolution using EMAN (
+\begin_inset LatexCommand \cite{EMAN}
+
+\end_inset 
+
+) and built into the envelope defined by
+\begin_inset Formula $1\sigma$
+\end_inset 
+
+ contour.
+ 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{3}
+\end_inset 
+
+ 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ positional restraints are placed on residues in secondary structures.
+ There are no positional restraints on sidechains and loops.
+ Hydrogen bonding restraints are used for 
+\begin_inset Formula $\beta$
+\end_inset 
+
+ sheets as described earlier, and also on 
+\begin_inset Formula $\alpha$
+\end_inset 
+
+ helices.
+ Ten models thus generated are shown in Fig.
+\begin_inset LatexCommand \ref{shapeSecstr}
+
+\end_inset 
+
+.
+ Model variations are large in loops but not in secondary structures due
+ to secondary-structure-specific sampling style used by 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+.
+\layout Section
+
+Conclusion
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+'s design makes it possible to apply discrete restraint-based modeling to
+ a variety of problems robustly and easily because
+\layout Itemize
+
+Introducing new builders, restraints, samplers and search strategies is
+ easy.
+\layout Itemize
+
+Any level of granularity can be chosen to represent the structure.
+\layout Itemize
+
+The user need not specify the order on restraints and builders, but a preferred
+ order may be imposed if needed.
+ 
+\layout Itemize
+
+Any number of coordinates may be known before modelling.
+ They can be used as restraints or to make seed builders or just as steric
+ obstructions.
+\layout Itemize
+
+Ensemble building and average restraints can be introduced easily by adding
+ restraints which check the average value of some property of the conformational
+ pool.
+\layout Standard
+
+The modularity and flexibility of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ makes it an attractive platform for carrying out discrete restraint-based
+ modeling tasks under a variety of restraints, as demonstrated here.
+ 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ can also be useful in generation of decoy sets useful in developing energy
+ functions for discriminating between non-native and native conformations.
+ Our immediate goals with this toolkit include exploring protein-ligand
+ and protein-RNA interface conformations, aiding automation of X-ray refinement
+ and developing a protocol for interpreting NMR restraints.
+ Analog (non-binary) restraints with a selection strategy to choose top-ranking
+ conformational possibilities will be added for this.
+ We also intend to analyze geometric preferences between adjacent secondary
+ structure elements and incorporate a secondary structure incremental sampling
+ algorithm to address sparse restraint scenarios.
+\layout Standard
+
+We would like to incorporate conformation-modifiers which tweak the structure
+ in a particular way, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+eg
+\end_inset 
+
+ local backbone moves, rigid-body fragment movements, sidechain flips and
+ so on.
+ Tweakers will be used as moves in simulated annealing to obtain a coarse
+ structural framework which will be elaborated to get atomic models, and
+ also for fine-grained structural refinement.
+\layout Part*
+
+Availability and requirements
+\layout Itemize
+
+Project name: 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+
+\layout Itemize
+
+Project home page: http://www-cryst.bioc.cam.ac.uk/~swanand/mysite/rtk/index.html
+\layout Itemize
+
+Operating system(s): Linux
+\layout Itemize
+
+Programming language: 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+Python
+\end_inset 
+
+ 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+C++
+\end_inset 
+
+
+\layout Itemize
+
+Other requirements: 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+swig
+\end_inset 
+
+
+\layout Itemize
+
+License: GNU GPL
+\layout Itemize
+
+Academic users can download the source code project home page and also as
+ additional file with this paper.
+ Commercial users should contact the authors for a license.
+\layout Section*
+
+Abbreviations
+\layout Description
+
+GABB Genetic algorithm with branch-and-bound algorithm
+\layout Description
+
+PDB Protein Data Bank
+\layout Description
+
+DFS Depth-first search
+\layout Description
+
+SWIG Simplified Wrapper and Interface Generator
+\layout Description
+
+RMSD Root mean square deviation
+\layout Section*
+
+Author Contributions
+\layout Standard
+
+SPG designed and implemented the software library and drafted the manuscript.
+ AMK performed benchmarking runs and contributed the corresponding section
+ in the manuscript.
+ TLB critically reviewed the manuscript and provided valuable guidance.
+\layout Section*
+
+Acknowledgements
+\layout Standard
+
+SPG and AMK thank Cambridge Commonwealth Trust and Universities UK for funding
+ their PhD studentships.
+\layout Standard
+\pagebreak_top 
+
+\begin_inset LatexCommand \BibTeX[bmc_article]{refs}
+
+\end_inset 
+
+
+\layout Section*
+\pagebreak_top 
+Figures
+\layout Standard
+
+
+\begin_inset Float figure
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+Basic concepts in 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+.
+ A sampler samples discrete conformational preferences (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+eg
+\end_inset 
+
+ 
+\begin_inset Formula $\phi,\psi,\omega$
+\end_inset 
+
+).
+ A builder uses the sample and calculates a set of unknown coordinates from
+ a set of known coordinates (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+eg
+\end_inset 
+
+ peptide building).
+ A restraint checks that the calculated coordinates satisfy some geometric
+ criterion (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+eg
+\end_inset 
+
+ whether calculated 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ coordinate lies within a spherical region).
+\layout Standard
+
+
+\begin_inset Graphics
+	filename peptbuilder.eps
+	width 150mm
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \label{peptbuilder}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float figure
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ architecture - modular and layered.
+ Modules written in 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+cpp
+\end_inset 
+
+ are exposed to 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+python
+\end_inset 
+
+ using automatic wrappers generated with 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+swig
+\end_inset 
+
+.
+\layout Standard
+
+
+\begin_inset Graphics
+	filename archi.eps
+	width 15cm
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \label{archi}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float figure
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+Automatic ordering of builders and restraints involved in sampling a three-resid
+ue peptide.
+\layout Standard
+
+(A) shows the builders and their output coordinates, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ positional restraints and the coordinates they test.
+ NB (N-anchor-builder), PB (
+\begin_inset Formula $\phi,\psi$
+\end_inset 
+
+-sampling based peptide builder), RPB (PB-like, but in reverse direction),
+ SC (backbone dependent sidechain builder) are used.
+ A builder points into the coordinates it computes and is pointed at by
+ the output coordinates of the builders it depends on.
+ Restraints contain the coordinates they test.
+\layout Standard
+
+
+\begin_inset Graphics
+	filename builderdep1.eps
+	width 100mm
+
+\end_inset 
+
+
+\layout Standard
+
+(B) On left is the dependence digraph on builders and restraints in (A).
+ A builder node depends upon the builder node it is pointed from.
+ A restraint node is connected to a builder after execution of which it
+ is possible to execute the restraint.
+ Topological sort (as described in text) on this digraph results (on right)
+ in a linear forward order (black) and fallback order (red) on builders.
+\layout Standard
+
+
+\begin_inset Graphics
+	filename builderdep2.eps
+	width 100mm
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \label{builderdep}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float figure
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+Guided sampling.
+ Location of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i}
+\end_inset 
+
+ can be described by specifying locations of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+C{i-2}
+\end_inset 
+
+, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+N{i-1}
+\end_inset 
+
+, 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i-1}
+\end_inset 
+
+ along with 
+\begin_inset Formula $\{ r,\alpha,\theta\}$
+\end_inset 
+
+ or 
+\begin_inset Formula $\{\phi,\psi,\omega\}$
+\end_inset 
+
+.
+ This leads to one-to-many mapping between 
+\begin_inset Formula $\{ r,\alpha,\theta\}$
+\end_inset 
+
+ and 
+\begin_inset Formula $\{\phi,\psi,\omega\}$
+\end_inset 
+
+.
+\layout Standard
+
+
+\begin_inset Graphics
+	filename guidedSampling.eps
+	width 15cm
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \label{guidedSampling}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float figure
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+Computational cost scales as a function of 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ restraint radius for 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ (squares), 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ (diamonds) and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ using backward building (triangles).
+ 5cpa is exluded.
+\layout Standard
+
+
+\begin_inset Graphics
+	filename mcCost.eps
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \label{mcCost}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float figure
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+Computational cost for all-atom modelling across target set.
+ The average time required to build a successful model is shown for 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ (diamonds), 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ (squares) and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ with guided sampling (triangles).
+\layout Standard
+
+
+\begin_inset Graphics
+	filename aaCost.eps
+	lyxscale 75
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \label{aaCost}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float figure
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+Loop closure procedure in 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+.
+ 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i}
+\end_inset 
+
+ lies on a circle centered at the midpoint of line joining 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i-1}
+\end_inset 
+
+ and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i+1}
+\end_inset 
+
+.
+ Radius of the circle is determined by length of the line.
+ The circle is in a plane perpendicular to the line.
+ Candidate 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+CA{i}
+\end_inset 
+
+ positions are sampled on this circle and 
+\begin_inset Formula $\{ r,\alpha,\theta\}-\{\phi,\psi,\omega\}$
+\end_inset 
+
+ mapping (explained earlier in relation to guided sampling) is used to select
+ a position.
+\layout Standard
+
+
+\begin_inset Graphics
+	filename loopClosure.eps
+	width 150mm
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \label{loopClosure}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float figure
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+p38 kinase in complex with a quinazoline ligand (PDB 1di9).
+ Green conformations are generated by 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+.
+ Sticks show the ligand.
+ Electron density not shown for clarity
+\layout Standard
+
+
+\begin_inset Graphics
+	filename 1di9.eps
+	width 150mm
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \label{1di9}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float figure
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ procedure for RNA sampling.
+ Bootstrap builder assigns the location of a few initial atoms of the first
+ nucleotide by rigid-body transformation from given structure satisfying
+ the positional restraints specified on C5*, C4*, C3* atoms.
+ Chain extension is carried out by RNAbuilder according to the backbone
+ dihedrals sampled by RNAsampler (using the rotamericity described in 
+\begin_inset LatexCommand \cite{RNAlib}
+
+\end_inset 
+
+).
+ RNAbuilder builds the corresponding sugar and base also.
+\layout Standard
+
+
+\begin_inset Graphics
+	filename rnaBuilder.eps
+	width 150mm
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \label{rnaBuilder}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float figure
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+Multiple conformations possible for a protein-RNA interface (helicase-core
+ region of Vasa, chains A, E in PDB 2db3) within electron density restraints.
+ Native structure is rendered as sticks and cartoon, five models as lines
+ and ribbon.
+ Electron density not shown for clarity.
+\begin_inset Note
+collapsed true
+
+\layout Standard
+
+all-atom nucleotides ?
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Graphics
+	filename 2db3.eps
+	width 15cm
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \label{2db3}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float figure
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+
+\begin_inset Formula $\beta$
+\end_inset 
+
+-hairpin building.
+ Blue is NanchorBuilder's output, red is that of forward PeptideBuilder,
+ brown is that of backward PeptideBuilder and magenta that of PeptideBridgeBuild
+er.
+ Dotted lines show the distance restraints used for hydrogen bonding in
+ addition to 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{0.5}
+\end_inset 
+
+ 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ positional restraints.
+\layout Standard
+
+
+\begin_inset Graphics
+	filename betaHairpin.eps
+	width 150mm
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \label{betaHairpin}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float figure
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+
+\begin_inset Formula $\beta$
+\end_inset 
+
+ sheet building by identifying the ladder and sampling along the steps.
+ Multiple strands and both (anti/parallel) arrangements can be sampled within
+ hydrogen bonding (angle C-O-N and distance O-N) restraints.
+\layout Standard
+
+
+\begin_inset Graphics
+	filename betasheet.eps
+	width 150mm
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \label{betaSheet}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float figure
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+Combining shape and secondary structure skeleton to generate atomic models
+\layout Standard
+
+
+\begin_inset Graphics
+	filename emShapeSS.eps
+	width 15cm
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset LatexCommand \label{shapeSecstr}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Section*
+\pagebreak_top 
+Tables
+\layout Standard
+
+
+\begin_inset Float table
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+Set of target proteins
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="10" columns="4">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Pdb Id
+\begin_inset Formula $^{\textrm{a}}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Protein Name
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Resolution
+\begin_inset Formula $^{\textrm{b}}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Size
+\begin_inset Formula $^{\textrm{c}}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1cem
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Cellulase
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.65
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+363
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1nif
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Nitrite reductase
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.6
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+333
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1php
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Phosphoglycerate kinase
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.65
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+394
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+3app
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Penicillopepsin
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.8
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+323
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+3pte
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Transpeptidase
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.6
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+347
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+4enl
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Enolase
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.9
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+436
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+5cpa
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Hydrolase (c-terminal peptidase)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.54
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+307
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+8abp
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Arabinose binding protein
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.49
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+305
+\end_inset 
+</cell>
+</row>
+<row bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+8tln:E
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Thermolysin
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.60
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+316
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Formula $^{\textrm{a}}$
+\end_inset 
+
+PDB code (and chain identifier, if necessary)
+\layout Standard
+
+
+\begin_inset Formula $^{\textrm{b}}$
+\end_inset 
+
+Resolution of the crystal structure in 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{}
+\end_inset 
+
+.
+\layout Standard
+
+
+\begin_inset Formula $^{\textrm{c}}$
+\end_inset 
+
+Number of amino acids in the protein chain.
+\layout Standard
+
+
+\begin_inset LatexCommand \label{targetSet}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float table
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+Comparison of mainchain RMSD under 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{1.0}
+\end_inset 
+
+ 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ restraint.
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="11" columns="7">
+<features>
+<column alignment="block" valignment="top" width="1in">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ Forward
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ Backward
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Target
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Mainchain
+\begin_inset Formula $^{a}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+
+\begin_inset Formula $^{b}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Mainchain
+\begin_inset Formula $^{a}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+
+\begin_inset Formula $^{b}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+Mainchain
+\begin_inset Formula $^{a}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+
+\begin_inset Formula $^{b}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1cem
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.69 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.66 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.69 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.68 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.66 (0.01)
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1nif
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.72 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.72 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.02)
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1php
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.70 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.66 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.70 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.66 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.70 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.66 (0.01)
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+3app
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.72 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.70 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.66 (0.01)
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+3pte
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+4enl
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.72 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.68 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+5cpa
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.73 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.68 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.73 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67(0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.72 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.02)
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+8abp
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.72 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67(0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+</row>
+<row bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+8tn:E
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.70 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67(0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Formula $^{a}$
+\end_inset 
+
+ Ensemble average main chain RMSD.
+\layout Standard
+
+
+\begin_inset Formula $^{b}$
+\end_inset 
+
+ Ensemble average 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ RMSD.
+\layout Standard
+
+
+\begin_inset LatexCommand \label{ca:1}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float table
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+Comparison of model accuracy under different 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ restraint thresholds
+\layout Standard
+
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="8" columns="6">
+<features>
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" leftline="true" rightline="true" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ restraint threshold in 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.5
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.5
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+2
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+
+\begin_inset Formula $^{c}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+MC
+\begin_inset Formula $^{b}$
+\end_inset 
+
+ 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.42 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.00 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.30 (0.03)
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+
+\begin_inset Formula $^{\textrm{a}}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.35 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67(0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.98(0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.29 (0.02)
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ Forward
+\begin_inset Formula $^{c}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+MC
+\begin_inset Formula $^{b}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.43 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.00 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.30 (0.03)
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+
+\begin_inset Formula $^{\textrm{a}}$
+\end_inset 
+
+ 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.35 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.98 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.29 (0.03)
+\end_inset 
+</cell>
+</row>
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ Backward
+\begin_inset Formula $^{d}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+MC
+\begin_inset Formula $^{\textrm{b}}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.42 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.00 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.30 (0.03)
+\end_inset 
+</cell>
+</row>
+<row bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+
+\begin_inset Formula $^{\textrm{a}}$
+\end_inset 
+
+ 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.35 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.67 (0.01)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.98 (0.02)
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.29 (0.03)
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+Values in parentheses indicate standard deviations.
+\layout Standard
+
+
+\begin_inset Formula $^{\textrm{a}}$
+\end_inset 
+
+Ensemble average 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ RMSD [
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{}
+\end_inset 
+
+] over all successfully modelled proteins.
+\layout Standard
+
+
+\begin_inset Formula $^{\textrm{b}}$
+\end_inset 
+
+Ensemble average main chain RMSD [
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{}
+\end_inset 
+
+] over all successfully modelled proteins.
+\layout Standard
+
+
+\begin_inset Formula $^{\textrm{c}}$
+\end_inset 
+
+No models could be generated for targets 4ENL, 8ABP, 8TLN under 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{0.5}
+\end_inset 
+
+ 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+ca
+\end_inset 
+
+ restraint by 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+ and 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ forward building.
+\layout Standard
+
+
+\begin_inset Formula $^{\textrm{d}}$
+\end_inset 
+
+ No models could be generated for targets 3PTE, 4ENL, 5CPA, 8ABP under 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{0.5}
+\end_inset 
+
+ restraint by 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ backward building
+\layout Standard
+
+
+\begin_inset LatexCommand \label{ca:mc:all}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Float table
+placement H
+wide false
+collapsed true
+
+\layout Caption
+
+Comparison of accuracy of all atom modelling
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="3" rows="11" columns="13">
+<features islongtable="true">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" leftline="true" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" rightline="true" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" rightline="true" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row topline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rapper
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ 
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="1" alignment="center" valignment="top" topline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+rappertk
+\end_inset 
+
+ Guided
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+<cell multicolumn="2" alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+\end_inset 
+</cell>
+</row>
+<row bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+PDB ID
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+MC 
+\begin_inset Formula $^{a}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+AA 
+\begin_inset Formula $^{b}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+chir
+\end_inset 
+
+
+\begin_inset Formula $_{1}$
+\end_inset 
+
+
+\begin_inset Formula $^{c}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+chir
+\end_inset 
+
+
+\begin_inset Formula $_{1,2}$
+\end_inset 
+
+
+\begin_inset Formula $^{d}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+MC
+\begin_inset Formula $^{a}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+AA
+\begin_inset Formula $^{b}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+chir
+\end_inset 
+
+
+\begin_inset Formula $_{1}$
+\end_inset 
+
+
+\begin_inset Formula $^{c}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+chir
+\end_inset 
+
+
+\begin_inset Formula $_{1,2}$
+\end_inset 
+
+
+\begin_inset Formula $\textrm{$^{d}$}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" bottomline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+MC
+\begin_inset Formula $^{a}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+AA
+\begin_inset Formula $^{b}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+chir
+\end_inset 
+
+
+\begin_inset Formula $_{1}$
+\end_inset 
+
+
+\begin_inset Formula $^{c}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+chir
+\end_inset 
+
+
+\begin_inset Formula $_{1,2}$
+\end_inset 
+
+
+\begin_inset Formula $^{d}$
+\end_inset 
+
+
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1cem
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.69
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.06
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+38.6
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+36.5
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.69
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.06
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+38.9
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+37.2
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.61
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.97
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+38.7
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+37.0
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1nif
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.10
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+40.4
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+42.7
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.09
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+39.6
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+42.4
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.68
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.04
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+39.8
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+42.5
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1php
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.7
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.07
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+39.4
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+41.1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.70
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.07
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+40.1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+41.4
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.63
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.99
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+39.8
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+41.9
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+3app
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.08
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+46.1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+53.1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.08
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+46.4
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+53.4
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.66
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.00
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+44.3
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+52.1
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+3pte
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.07
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+44.0
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+39.7
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.07
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+42.8
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+39.8
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.65
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.98
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+43.1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+38.9
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+4enl
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.06
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+42.2
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+39.4
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.06
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+42.4
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+39.3
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.64
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.98
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+41.9
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+39.4
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+5cpa
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+0.73 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+1.13
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+44.74 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+48.3
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.72
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.12
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+43.6
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+48.1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.65
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.04
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+42.9
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+47.6
+\end_inset 
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+8abp
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.10
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+41.6
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+41.9
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+0.72 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+ 1.10
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+40.5
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+41.7
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+0.63 
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+1.01
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+
+\family roman 
+\series medium 
+\shape up 
+\size normal 
+\emph off 
+\bar no 
+\noun off 
+\color none
+41.2
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+41.3
+\end_inset 
+</cell>
+</row>
+<row bottomline="true">
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+8tln:E
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.71
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.07
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+43.5
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+39.1
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.7
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+1.06
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+43.4
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+38.6
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.64
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+0.98
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+42.3
+\end_inset 
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\layout Standard
+
+38.1
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+
+\begin_inset Formula $^{a}$
+\end_inset 
+
+ Average main chain RMSD (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{}
+\end_inset 
+
+) of 50 models for each protein, averaged over all proteins in target set.
+\layout Standard
+
+
+\begin_inset Formula $^{b}$
+\end_inset 
+
+ Average all atom RMSD (
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+Ang{}
+\end_inset 
+
+) of 50 models for each protein, averaged over all proteins in target set.
+\layout Standard
+
+
+\begin_inset Formula $^{c}$
+\end_inset 
+
+ Percentage of side chains with 
+\begin_inset Formula $\chi_{1}$
+\end_inset 
+
+ > 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+degr{40}
+\end_inset 
+
+ of the equivalent 
+\begin_inset Formula $\chi_{1}$
+\end_inset 
+
+ in the crystal structure, averaged over all proteins in target set.
+\layout Standard
+
+
+\begin_inset Formula $^{d}$
+\end_inset 
+
+ Percentage of side chains with 
+\begin_inset Formula $\chi_{1,2}$
+\end_inset 
+
+ > 
+\begin_inset ERT
+status Collapsed
+
+\layout Standard
+
+\backslash 
+degr{40}
+\end_inset 
+
+ of the equivalent 
+\begin_inset Formula $\chi_{1,2}$
+\end_inset 
+
+ in the crystal structure, averaged over all proteins in target set.
+\layout Standard
+
+
+\begin_inset LatexCommand \label{all_atom}
+
+\end_inset 
+
+
+\end_inset 
+
+
+\the_end

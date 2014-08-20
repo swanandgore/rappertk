@@ -1,0 +1,4 @@
+Water and other HETATMS are ignored during the model building procedure. They are copied from the gien coordinate file into the output file at the end of a round of model building.
+Only the standard amino acids and MSE are reccognised. All other modified reidues as follows:
+(1) If --use-ca-restraint False : The residue will be skipped and the program will attempt to link the adjoining residues.
+(2) If --use-ca-restraint True : 

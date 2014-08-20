@@ -1,0 +1,14 @@
+#include <stdlib.h>
+
+#include "misc/RanGen.h"
+#include "OmegaSampler.h"
+
+
+OmegaSampler::OmegaSampler(float trprop) : transprop(trprop) {}
+
+int OmegaSampler::sample(int& omega) {
+    if(ran01() > transprop) { omega = 0; return 0; }
+    else { omega = -180; return 1; }
+}
+
+int OmegaSampler::maxUniqueSamples() { return 2; }

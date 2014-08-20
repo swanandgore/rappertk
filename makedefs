@@ -1,0 +1,87 @@
+SHELL=/bin/bash
+
+default: all
+
+#{{{ Must have RTKROOT, SWIGLIBPATH and PYINCPATH set to sensible values
+check:
+	@echo "* Set RTKROOT, SWIGLIBPATH, PYINCPATH to appropriate values"
+	@echo "    e.g. setenv RTKROOT /home/swanand/cb (contains makedefs)" [$(RTKROOT)]
+	@echo "    e.g. setenv SWIGLIBPATH /home/swanand/downloads/swig-1.3.28/Lib (contains swigrun.swg)" [$(SWIGLIBPATH)]
+	@echo "    e.g. setenv PYINCPATH /usr/include/python2.4 (contains Python.h)" [$(PYINCPATH)]
+	@echo "    e.g. setenv BGLROOT /home/swanand/downloads/BGL/boost_1_33_0" [$(BGLROOT)]
+	@echo "* Check that your swig is at least 1.3.28 and python is at least 2.4"
+	@echo "    e.g. swig -version ; python -V"
+	@echo "* If you have clipper, set CLIPPER variable properly"
+	@echo "    e.g. setenv CLIPPER /home/swanand/downloads/clipper (contains ccp4-onlylibs-dev)" [$(CLIPPER)]
+	@echo "* Now compile with make clobber ; make depend ; make"
+#}}}
+
+
+#{{{ compilers / tools
+CXX = g++
+LD = g++
+SWIG = swig
+#}}}
+
+#{{{ cpp compiler/linker flags
+OPTFLAGS = -O3 -DNDEBUG -funroll-loops
+INCFLAGS += -I$(PYINCPATH) -I$(RTKROOT) # cpp include files
+CFLAGS += $(INCFLAGS) -Wall -fPIC $(OPTFLAGS)
+#LINCFLAGS =  cpp lib paths
+LIBFLAGS = $(LIBSOURCES:%=-l%)
+LDFLAGS = $(LINCFLAGS) $(LIBFLAGS) $(OPTFLAGS)
+#}}}
+
+#{{{ .x -> .y rules
+%.o : %.cpp
+	@echo "compiling"
+	$(CXX) $(CFLAGS) -c $< -o $@
+%_wrap.cpp : %.i
+	$(SWIG) -I$(SWIGLIBPATH)/python -c++ -python -o $@ $<
+#}}}
+
+#{{{ swig's isources
+CSOURCES += $(ISOURCES:%=%_wrap)
+DIRT += $(ISOURCES:%=%_wrap.cpp)
+#}}}
+
+#{{{ subdirs makerule
+SUBDIRS_MAKERULE =			\
+    @for dir in $(SUBDIRS); do              \
+	if [ -d $$dir ]; then               \
+	    ( cd $$dir && make $@);      \
+	fi                                  \
+    done                                    \
+#}}}
+
+#{{{ make default, tests, clean, depend, all, doc
+depend:
+	$(SUBDIRS_MAKERULE)
+	makedepend -Y $(INCFLAGS) *.cpp
+	makedepend -a -Y -o _wrap.o *.i
+
+COBJECTS = $(CSOURCES:%=%.o)
+DIRT += $(COBJECTS)
+
+all: $(COBJECTS)
+	$(SUBDIRS_MAKERULE)
+ifdef SWIGLIB
+	$(LD) -shared -o _$(SWIGLIB).so $(COBJECTS) $(LDFLAGS)
+endif
+
+clean:
+	$(SUBDIRS_MAKERULE)
+	rm -Rf *.o *_wrap.cpp
+
+clobber:
+	$(SUBDIRS_MAKERULE)
+	rm -Rf *.o *_wrap.cpp *.so *.pyc
+
+doc:
+	doxygen Doxyfile
+
+tests:
+	@for dir in $(TESTDIRS); do \
+		( cd test/$$dir && echo $$PWD "TESTING -------------------------------------------------------" &&  ./testscr );     \
+	done
+#}}}
