@@ -1,0 +1,7 @@
+phi,psi,omega to r,a,t mapping in fwd.level files
+
+psi,phi,omega to r,a,t mapping in bwd.level files
+
+level is the phi-psi propensity level (lower) cutoff
+
+appscripts/rat.py generated this data
